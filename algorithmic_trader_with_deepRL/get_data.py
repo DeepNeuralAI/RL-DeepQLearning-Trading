@@ -45,20 +45,16 @@ def get_path(symbol, base_dir=None):
 
 
 def load_data(symbols, dates, SPY=True, column_name='adjusted_close'):
-		df = pd.DataFrame(index = dates)
+	df = pd.DataFrame(index = dates)
 
-		if SPY and 'SPY' not in symbols: symbols.append('SPY')
+	if SPY and 'SPY' not in symbols: symbols.append('SPY')
 
-		for symbol in symbols:
-				temp = pd.read_csv(get_path(symbol),
-														index_col = 'timestamp',
-														parse_dates=True,
-														usecols=['timestamp', column_name],
-														na_values=['nan'])
-				temp.rename(columns={'adjusted_close': symbol}, inplace=True)
-				df = df.join(temp)
-		if symbol == 'SPY': df = df.dropna(subset=["SPY"])
-		return df
+	for symbol in symbols:
+		temp = pd.read_csv(get_path(symbol), index_col = 'timestamp', parse_dates=True, usecols=['timestamp', column_name], na_values=['nan'])
+		temp.rename(columns={f'{column_name}': symbol}, inplace=True)
+		df = df.join(temp)
+	if symbol == 'SPY': df = df.dropna(subset=["SPY"])
+	return df
 
 if __name__ == "__main__":
 	prompt_csv()
