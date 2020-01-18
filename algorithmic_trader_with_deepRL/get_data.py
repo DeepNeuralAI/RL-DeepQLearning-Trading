@@ -43,7 +43,6 @@ def get_path(symbol, base_dir=None):
 		base_dir = os.environ.get('PWD')
 	return os.path.join(base_dir, f'data/daily_adjusted_{symbol}.csv')
 
-
 def load_data(symbols, dates, SPY=True, column_name='adjusted_close'):
 	df = pd.DataFrame(index = dates)
 
