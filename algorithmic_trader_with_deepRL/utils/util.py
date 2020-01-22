@@ -37,5 +37,28 @@ def data_df(symbol, n_period = 7, fillna = True):
   df = df.join(add_volume_indicators(high, low, close, volume, n_period, fillna))
   return df
 
+def holdings_df(trades, starting_balance):
+  holdings = trades.copy()
+  holdings['Cash'][0] += starting_balance
+  return holdings.cumsum()
 
 
+def stock_value_df(prices, holdings):
+  holdings_ = holdings.drop('Cash', axis = 1)
+  vals = prices[:, None] * holdings_
+  vals['Cash'] = holdings[['Cash']]
+  return vals.sum(axis = 1)
+
+def portfolio_statistics(values, daily_rf = 0, samples_per_year = 252):
+  cum_return = (values[-1] / values[0]) - 1
+
+  daily_returns = (values /values.shift(1)) - 1
+  daily_returns.iloc[0] = 0
+  daily_returns = daily_returns[1:]
+
+  avg_daily_returns = daily_returns.mean()
+  std_daily_returns = daily_returns.std()
+
+  K = np.sqrt(samples_per_year)
+  sharpe_ratio = K * (avg_daily_returns - daily_rf) / std_daily_returns
+  return cum_return, avg_daily_returns, std_daily_returns, sharpe_ratio

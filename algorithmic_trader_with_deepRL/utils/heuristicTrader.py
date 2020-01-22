@@ -1,5 +1,6 @@
 import pandas as pd
 from util import data_df
+import numpy as np
 
 class HeuristicTrader():
   def __init__(self, symbol, start_date, end_date, window = 7, max_shares = 100):
@@ -34,24 +35,24 @@ class HeuristicTrader():
     shares = []
     net_holdings = 0
 
-    for index, row in self.policy.iterrows():
+    for _, row in self.policy.iterrows():
       buy = row['indicator'] > 0
       sell = row['indicator'] < 0
 
       if buy and net_holdings == 0:
-          shares.append(self.max_shares)
-          net_holdings += self.max_shares
+        shares.append(self.max_shares)
+        net_holdings += self.max_shares
       elif buy and net_holdings == -self.max_shares:
-          shares.append(self.max_shares * 2)
-          net_holdings += self.max_shares * 2
+        shares.append(self.max_shares * 2)
+        net_holdings += self.max_shares * 2
       elif sell and net_holdings == 0:
-          shares.append(-self.max_shares)
-          net_holdings += -self.max_shares
+        shares.append(-self.max_shares)
+        net_holdings += -self.max_shares
       elif sell and net_holdings == self.max_shares:
-          shares.append(-self.max_shares * 2)
-          net_holdings += -self.max_shares * 2
+        shares.append(-self.max_shares * 2)
+        net_holdings += -self.max_shares * 2
       else:
-          shares.append(0)
+        shares.append(0)
     return shares
 
   def trades_df(self):
