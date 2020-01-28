@@ -8,6 +8,7 @@ from keras.models import load_model, clone_model
 from keras.layers import Dense
 from keras.optimizers import Adam
 from tensorflow.keras.losses import Huber
+from src.utils import timestamp
 
 class RLAgent:
   def __init__(self, state_size, model_type = 'ddqn', pretrained = False, model_name = None, reset_target_weight_interval = 100):
@@ -26,9 +27,7 @@ class RLAgent:
     self.radr = 0.995 # Random Action Decay Rate
     self.lr = 0.001
     self.loss = Huber
-    self.custom_objects = {
-      "huber_loss": Huber
-    }
+    self.custom_objects = {"huber_loss": Huber()}
     self.optimizer = Adam(lr = self.lr)
 
     if pretrained and self.model_name is not None:
@@ -45,7 +44,7 @@ class RLAgent:
   def load(self):
     return load_model(f"models/{self.model_name}", custom_objects = self.custom_objects)
 
-  def save_model(self, episode):
+  def save(self, episode):
     self.model.save(f"models/{self.model_name}_{episode}")
 
   def model_(self):
@@ -56,7 +55,7 @@ class RLAgent:
     model.add(Dense(units=128, activation="relu"))
     model.add(Dense(units=self.action_size))
 
-    model.compile(optimizer = self.optimizer, loss = self.loss)
+    model.compile(optimizer = self.optimizer, loss = self.loss())
     return model
 
   def action(self, state, eval = False):

@@ -79,13 +79,13 @@ def evaluate_model(agent, data, window_size, verbose):
       history.append((data[t], "SELL"))
 
       if verbose:
-        logging.debug(f"Sell at: {format_currency(data[t])} | Position: {format_position(data[t] - bought_price)}")
+        logging.debug(f"Sell at: {format_currency(data[t])} | Position: {format_position(data[t] - purchase_price)}")
 
     else:
       history.append((data[t], "HOLD"))
       shares.append(0)
 
-    done = (t == data_length - 1)
+    done = (t == num_observations - 1)
     agent.memory.append((state, action, reward, next_state, done))
     state = next_state
 
