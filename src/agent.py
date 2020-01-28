@@ -36,7 +36,7 @@ class RLAgent:
       self.model = self.model_()
 
     self.n_iter = 1
-    self.reset_interval = reset_target_weight_interval
+    self.rewset_interval = reset_target_weight_interval
 
     self.target_model = clone_model(self.model)
     self.target_model.set_weights(self.model.get_weights())
@@ -45,6 +45,8 @@ class RLAgent:
     return load_model(f"models/{self.model_name}", custom_objects = self.custom_objects)
 
   def save(self, episode):
+    if self.model_name is None:
+      self.model_name = f'{self.model_type}_{timestamp()}'
     self.model.save(f"models/{self.model_name}_{episode}")
 
   def model_(self):
