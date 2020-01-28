@@ -20,7 +20,7 @@ class PerfectTrader():
     return data.loc[date_range].dropna()
 
   def strategy(self):
-    return np.sign(self.data.shift(-1) - self.data).fillna(0)
+    return np.sign((self.data.shift(-1) - self.data).fillna(0))
 
   def shares_df(self):
     shares = []

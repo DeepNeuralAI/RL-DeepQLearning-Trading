@@ -33,6 +33,7 @@ def data_df(symbol, n_period = 7, fillna = True):
   high, low, close, volume = data.high, data.low, data.close, data.volume
   df = df.join(add_momentum_indicators(high, low, close, volume, n_period, fillna))
   df = df.join(add_trend_indicators(high, low, close, volume, n_period, fillna))
+  df.drop('trend_mi', axis = 1, inplace = True)
   df = df.join(add_volatility_indicators(high, low, close, n_period, fillna))
   df = df.join(add_volume_indicators(high, low, close, volume, n_period, fillna))
   return df
