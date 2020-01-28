@@ -9,8 +9,6 @@ from src.agent import RLAgent
 import os
 
 
-
-
 def run(training_stock, validation_stock, window_size, batch_size, episode_count, model_type="ddqn", model_name=f"model_{timestamp()}", pretrained = False, verbose = False):
   agent = RLAgent(window_size, model_type = model_type, model_name = model_name)
 
@@ -25,15 +23,10 @@ def run(training_stock, validation_stock, window_size, batch_size, episode_count
     show_training_result(training_result, validation_result, initial_offset)
 
 if __name__ == "__main__":
-  coloredlogs.install(level = "DEBUG")
-
-  if K.backend() == "tensorflow":
-    logging.debug("Switching --> TensorFlow for CPU")
-    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
-
   args = docopt(__doc__)
-  training_stock = args["<training_stock>"]
-  validation_stock = args["<validation_stock>"]
+
+  training_stock = args["<training-stock>"]
+  validation_stock = args["<validation-stock>"]
   model_type = args["--model-type"]
   window_size = args["--window-size"]
   batch_size = args["--batch-size"]
@@ -42,6 +35,12 @@ if __name__ == "__main__":
   model_name = args["--model-name"]
   pretrained = args["--pretrained"]
   verbose = args["--verbose"]
+
+  coloredlogs.install(level = "DEBUG")
+
+  if K.backend() == "tensorflow":
+    logging.debug("Switching --> TensorFlow for CPU")
+    os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
   try:
     run(training_stock, validation_stock, window_size, batch_size, episode_count,
