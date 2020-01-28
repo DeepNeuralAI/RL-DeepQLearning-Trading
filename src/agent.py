@@ -36,7 +36,7 @@ class RLAgent:
       self.model = self.model_()
 
     self.n_iter = 1
-    self.rewset_interval = reset_target_weight_interval
+    self.reset_interval = reset_target_weight_interval
 
     self.target_model = clone_model(self.model)
     self.target_model.set_weights(self.model.get_weights())
