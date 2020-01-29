@@ -27,7 +27,7 @@ class RLAgent:
     self.eps_min = 0.01
     self.radr = 0.995 # Random Action Decay Rate
     self.lr = 0.001
-    self.loss = Huber
+    self.loss = Huber()
     self.custom_objects = {"huber": Huber()}
     self.optimizer = Adam(lr = self.lr)
 
@@ -44,7 +44,7 @@ class RLAgent:
 
   def load(self):
     model = load_model(f"models/{self.model_name}", custom_objects = self.custom_objects, compile=False)
-    model.compile(optimizer = self.optimizer, loss = self.loss())
+    model.compile(optimizer = self.optimizer, loss = self.loss)
     return model
 
 
