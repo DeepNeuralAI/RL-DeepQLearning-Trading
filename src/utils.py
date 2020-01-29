@@ -3,6 +3,7 @@ import math
 import logging
 import pandas as pd
 import numpy as np
+import pdb
 
 def timestamp():
   return round(dt.datetime.now().timestamp())
@@ -13,22 +14,23 @@ def format_position(price):
   else:
     return f'+${abs(price)}'
 
-
 def format_currency(price):
   return f'${abs(price)}'
-
-def get_state():
-  pass
 
 def sigmoid(x):
   return 1 / (1 + math.exp(-x))
 
-def get_state(data, t, n_days):
+def get_state(data, t, n_days, rnn_model = None):
   d = t - n_days + 1
   block = data[d: t + 1] if d >= 0 else -d * [data[0]] + data[0: t + 1]  # pad with t0
   res = []
-  for i in range(n_days - 1):
+  if rnn_model is None:
+    for i in range(n_days - 1):
       res.append(sigmoid(block[i + 1] - block[i]))
+  else:
+    horiz = rnn_model.predict(np.array(block[1:]).reshape(1, n_days - 1, 1))
+    for i in range(n_days - 1):
+      res.append(sigmoid(horiz[0][i]))
   return np.array([res])
 
 def show_training_result(result, val_position, initial_offset):

@@ -4,22 +4,27 @@ import coloredlogs
 from docopt import docopt
 import datetime as dt
 import keras.backend as K
+import numpy as np
+
 from src.utils import timestamp, show_training_result, get_stock_data
 from src.methods import train_model, evaluate_model
 from src.agent import RLAgent
 import os
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
+import pdb
 
 
-def run(training_stock, validation_stock, window_size, batch_size, episode_count, model_type="ddqn", model_name = None, pretrained = False, verbose = False):
-  agent = RLAgent(window_size, model_type = model_type, model_name = model_name)
+def run(training_stock, validation_stock, window_size, batch_size, episode_count, model_type="ddqn", model_name = None, pretrained = False, verbose = False, mode = None):
 
   training_data = get_stock_data(training_stock)
   validation_data = get_stock_data(validation_stock)
 
+  agent = RLAgent(window_size, model_type = model_type, model_name = model_name)
+
   initial_offset = validation_data[1] - validation_data[0]
 
   for episode in range(1, episode_count + 1):
-    training_result = train_model(agent, episode, training_data, episode_count = episode_count, batch_size = batch_size, window_size = window_size)
+    training_result = train_model(agent, episode, training_data, episode_count = episode_count, batch_size = batch_size, window_size = window_size, rnn = mode)
     validation_result, _, shares = evaluate_model(agent, validation_data, window_size, verbose)
     show_training_result(training_result, validation_result, initial_offset)
 
@@ -34,6 +39,7 @@ if __name__ == '__main__':
   parser.add_argument('--model-name')
   parser.add_argument('--pretrained', default = False)
   parser.add_argument('--verbose', default = False)
+  parser.add_argument('--mode')
 
   args = parser.parse_args()
 
@@ -43,6 +49,7 @@ if __name__ == '__main__':
   window_size = int(args.window_size)
   batch_size = int(args.batch_size)
   episode_count = int(args.episode_count)
+  mode = args.mode
 
   model_name = args.model_name
   pretrained = args.pretrained
@@ -55,7 +62,7 @@ if __name__ == '__main__':
     os.environ["CUDA_VISIBLE_DEVICES"] = "-1"
 
   try:
-    run(training_stock, validation_stock, window_size, batch_size, episode_count,
+    run(training_stock, validation_stock, window_size, batch_size, episode_count, mode = mode,
     model_type=model_type, pretrained = pretrained, verbose = verbose)
   except KeyboardInterrupt:
     print("Aborted with Keyboard Interrupt..")
