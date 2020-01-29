@@ -3,7 +3,6 @@ import logging
 import numpy as np
 from tqdm import tqdm
 from src.utils import get_state, format_currency, format_position, normalize
-import pdb
 
 def train_model(agent, episode, data, episode_count = 50, batch_size = 32):
   total_profit = 0
@@ -22,16 +21,17 @@ def train_model(agent, episode, data, episode_count = 50, batch_size = 32):
     next_state = get_state(normed_data, t + 1)
     action = agent.action(state)
 
-    if action == 1:
+    if action == 1: # Buy
       agent.inventory.append(data.price[t])
       shares.append(1)
-    elif action == 2 and len(agent.inventory) > 0:
+      reward -= 0.1 # Commission Penalty
+    elif action == 2 and len(agent.inventory) > 0: # Sell
       purchase_price = agent.inventory.pop(0)
       delta = data.price[t] - purchase_price
-      reward = delta
+      reward = delta - 0.1 # Commission Penalty
       total_profit += delta
       shares.append(-1)
-    else:
+    else: # Hold
       shares.append(0)
 
     done = (t == (num_observations - 1))

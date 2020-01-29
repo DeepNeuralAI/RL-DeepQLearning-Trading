@@ -9,7 +9,6 @@ from keras.layers import Dense
 from keras.optimizers import Adam
 from tensorflow.keras.losses import Huber
 from src.utils import timestamp
-import pdb
 
 class RLAgent:
   def __init__(self, state_size, model_type = 'ddqn', pretrained = False, model_name = None, reset_target_weight_interval = 100):
@@ -55,10 +54,10 @@ class RLAgent:
 
   def model_(self):
     model = Sequential()
-    model.add(Dense(units=128, activation="relu", input_dim=self.state_size))
+    model.add(Dense(units=256, activation="relu", input_dim=self.state_size))
+    model.add(Dense(units=512, activation="relu"))
+    model.add(Dense(units=512, activation="relu"))
     model.add(Dense(units=256, activation="relu"))
-    model.add(Dense(units=256, activation="relu"))
-    model.add(Dense(units=128, activation="relu"))
     model.add(Dense(units=self.action_size))
 
     model.compile(optimizer = self.optimizer, loss = self.loss)

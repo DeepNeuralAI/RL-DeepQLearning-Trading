@@ -3,6 +3,7 @@ import math
 import logging
 import pandas as pd
 import numpy as np
+
 from .technical_indicators import (
   indicators_dict,
   add_momentum_indicators,
