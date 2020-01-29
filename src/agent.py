@@ -9,6 +9,7 @@ from keras.layers import Dense
 from keras.optimizers import Adam
 from tensorflow.keras.losses import Huber
 from src.utils import timestamp
+import pdb
 
 class RLAgent:
   def __init__(self, state_size, model_type = 'ddqn', pretrained = False, model_name = None, reset_target_weight_interval = 100):
@@ -80,6 +81,7 @@ class RLAgent:
         self.target_model.set_weights(self.model.get_weights())
 
       for state, action, reward, next_state, done in mini_batch:
+
         if done:
           target = reward
         else:
