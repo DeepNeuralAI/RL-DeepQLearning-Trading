@@ -28,7 +28,7 @@ class RLAgent:
     self.radr = 0.995 # Random Action Decay Rate
     self.lr = 0.001
     self.loss = Huber
-    self.custom_objects = {"huber_loss": Huber()}
+    self.custom_objects = {"huber": Huber()}
     self.optimizer = Adam(lr = self.lr)
 
     if pretrained and self.model_name is not None:
@@ -43,7 +43,10 @@ class RLAgent:
     self.target_model.set_weights(self.model.get_weights())
 
   def load(self):
-    return load_model(f"models/{self.model_name}", custom_objects = self.custom_objects)
+    model = load_model(f"models/{self.model_name}", custom_objects = self.custom_objects, compile=False)
+    model.compile(optimizer = self.optimizer, loss = self.loss())
+    return model
+
 
   def save(self, episode):
     if self.model_name is None:
@@ -58,7 +61,7 @@ class RLAgent:
     model.add(Dense(units=128, activation="relu"))
     model.add(Dense(units=self.action_size))
 
-    model.compile(optimizer = self.optimizer, loss = self.loss())
+    model.compile(optimizer = self.optimizer, loss = self.loss)
     return model
 
   def action(self, state, eval = False):

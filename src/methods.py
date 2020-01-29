@@ -72,7 +72,7 @@ def evaluate_model(agent, data, verbose):
       history.append((data.price[t], "BUY"))
 
       if verbose:
-        logging.debug(f"Buy at: {format_currency(data[t])}")
+        logging.debug(f"Buy at: {format_currency(data.price[t])}")
 
     elif action == 2 and len(agent.inventory) > 0:
       purchase_price = agent.inventory.pop(0)
