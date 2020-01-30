@@ -4,6 +4,7 @@ import logging
 import pandas as pd
 import numpy as np
 import pdb
+from statsmodels.tsa.arima_model import ARIMA
 
 def timestamp():
   return round(dt.datetime.now().timestamp())
@@ -20,17 +21,23 @@ def format_currency(price):
 def sigmoid(x):
   return 1 / (1 + math.exp(-x))
 
-def get_state(data, t, n_days, rnn_model = None):
-  d = t - n_days + 1
-  block = data[d: t + 1] if d >= 0 else -d * [data[0]] + data[0: t + 1]  # pad with t0
+def get_state(data, t, n_days, mode=None):
   res = []
-  if rnn_model is None:
-    for i in range(n_days - 1):
-      res.append(sigmoid(block[i + 1] - block[i]))
+  d = t - n_days + 1
+
+  if d >= 0:
+    block = data[d: t + 1]
   else:
-    horiz = rnn_model.predict(np.array(block[1:]).reshape(1, n_days - 1, 1))
-    for i in range(n_days - 1):
-      res.append(sigmoid(horiz[0][i]))
+   block = -d * [data[0]] + data[0: t + 1]
+
+
+  if mode == 'arima' and d >= 0:
+    model = ARIMA(block, order = (5, 1, 0))
+    model_fit = model.fit(disp = 0)
+    block, _, _ = model_fit.forecast(steps = len(block))
+
+  for i in range(n_days - 1):
+      res.append(sigmoid(block[i + 1] - block[i]))
   return np.array([res])
 
 def show_training_result(result, val_position, initial_offset):
