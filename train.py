@@ -1,4 +1,5 @@
 import argparse
+import os
 import logging
 import coloredlogs
 from docopt import docopt
@@ -10,10 +11,10 @@ from src.utils import timestamp, show_training_result, get_stock_data
 from src.methods import train_model, evaluate_model
 from src.agent import RLAgent
 from src.rnn import RNN
-import os
-os.environ['KMP_DUPLICATE_LIB_OK']='True'
 import pdb
 
+
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 
 def run(training_stock, validation_stock, window_size, batch_size, episode_count, model_type="ddqn", model_name = None, pretrained = False, verbose = False, mode = None):
   training_data = get_stock_data(training_stock)
@@ -32,10 +33,14 @@ def run(training_stock, validation_stock, window_size, batch_size, episode_count
 
   initial_offset = validation_data[1] - validation_data[0]
 
+  history = []
+
   for episode in range(1, episode_count + 1):
     training_result = train_model(agent, episode, training_data, episode_count = episode_count, batch_size = batch_size, window_size = window_size, mode = mode)
     validation_result, _, shares = evaluate_model(agent, validation_data, window_size, verbose, mode = mode)
     show_training_result(training_result, validation_result, initial_offset)
+    history.append((training_result[0], training_result[2]))
+    print(history)
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Deep RL in Algo Trading')
