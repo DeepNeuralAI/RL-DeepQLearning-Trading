@@ -42,7 +42,7 @@ class RLAgent:
     self.target_model.set_weights(self.model.get_weights())
 
   def load(self):
-    return load_model(f"models/{self.model_name}", custom_objects = self.custom_objects)
+    return load_model(f"models/{self.model_name}", custom_objects = self.custom_objects, compile = False)
 
   def save(self, episode):
     if self.model_name is None:

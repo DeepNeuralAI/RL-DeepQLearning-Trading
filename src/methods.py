@@ -6,7 +6,7 @@ from src.utils import get_state, format_currency, format_position
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import load_model
 
-def train_model(agent, episode, data, episode_count = 50, batch_size = 32, window_size = 10, rnn = None):
+def train_model(agent, episode, data, episode_count = 50, batch_size = 32, window_size = 10):
   total_profit = 0
   num_observations = len(data) - 1
 
@@ -14,20 +14,11 @@ def train_model(agent, episode, data, episode_count = 50, batch_size = 32, windo
   shares = []
   average_loss = []
 
-  if rnn == "rnn":
-    scaler = MinMaxScaler()
-    data_ = scaler.fit_transform(np.array(data).reshape(-1, 1))
-    # rnn = RNN(data_, lag = window_size, horizon = window_size, num_features = 1)
-    # pdb.set_trace()
-    # rnn.train()
-    # rnn.model.save(f"models/rnn_{self.model_name}")
-    rnn = load_model('models/rnn_50')
-
-  state = get_state(data, 0, window_size + 1, rnn_model = rnn)
+  state = get_state(data, 0, window_size + 1)
 
   for t in tqdm(range(num_observations), total = num_observations, leave = True, desc = f'Episode {episode}/{episode_count}'):
     reward = 0
-    next_state = get_state(data, t + 1, window_size + 1, rnn_model = rnn)
+    next_state = get_state(data, t + 1, window_size + 1)
     action = agent.action(state)
 
     if action == 1:
@@ -57,7 +48,7 @@ def train_model(agent, episode, data, episode_count = 50, batch_size = 32, windo
   return (episode, episode_count, total_profit, np.array(average_loss).mean())
 
 
-def evaluate_model(agent, data, window_size, verbose, rnn = None):
+def evaluate_model(agent, data, window_size, verbose):
   total_profit = 0
   num_observations = len(data) - 1
 
@@ -65,11 +56,11 @@ def evaluate_model(agent, data, window_size, verbose, rnn = None):
   history = []
   agent.inventory = []
 
-  state = get_state(data, 0, window_size + 1, rnn_model = rnn)
+  state = get_state(data, 0, window_size + 1)
 
   for t in range(num_observations):
     reward = 0
-    next_state = get_state(data, t + 1, window_size + 1, rnn_model = rnn)
+    next_state = get_state(data, t + 1, window_size + 1)
 
     action = agent.action(state, eval = True)
 
