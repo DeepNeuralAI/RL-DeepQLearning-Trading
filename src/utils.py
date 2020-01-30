@@ -4,7 +4,7 @@ import logging
 import pandas as pd
 import numpy as np
 import pdb
-from statsmodels.tsa.arima_model import ARIMA
+import pmdarima as pm
 
 def timestamp():
   return round(dt.datetime.now().timestamp())
@@ -22,6 +22,7 @@ def sigmoid(x):
   return 1 / (1 + math.exp(-x))
 
 def get_state(data, t, n_days, mode=None):
+
   res = []
   d = t - n_days + 1
 
@@ -30,11 +31,16 @@ def get_state(data, t, n_days, mode=None):
   else:
    block = -d * [data[0]] + data[0: t + 1]
 
-
   if mode == 'arima' and d >= 0:
-    model = ARIMA(block, order = (5, 1, 0))
-    model_fit = model.fit(disp = 0)
-    block, _, _ = model_fit.forecast(steps = len(block))
+    arima = pm.auto_arima(data, start_p=1, start_q=1,
+                           max_p=3, max_q=10, m=4,
+                           start_P=0, seasonal=True,
+                           d=1, D=1, trace=True,
+                           error_action='ignore',
+                           suppress_warnings=True,
+                           stepwise=True)
+    arima.fit(block)
+    block = arima.predict(n_periods = len(block))
 
   for i in range(n_days - 1):
       res.append(sigmoid(block[i + 1] - block[i]))

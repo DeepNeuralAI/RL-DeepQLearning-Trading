@@ -20,15 +20,6 @@ def run(training_stock, validation_stock, window_size, batch_size, episode_count
   training_data = get_stock_data(training_stock)
   validation_data = get_stock_data(validation_stock)
 
-  # if mode == 'rnn':
-  #   if model_name is None:
-  #     data_ = np.array(training_data) / np.array(training_data)[0]
-  #     rnn = RNN(data_, lag = window_size, horizon = window_size, epochs = 100)
-  #     rnn.train()
-  #     rnn.model.save('models/rnn_100')
-  #     print('Saved..')
-  #     return
-
   agent = RLAgent(window_size, model_type = model_type, model_name = model_name)
 
   initial_offset = validation_data[1] - validation_data[0]
