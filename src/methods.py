@@ -6,7 +6,7 @@ from src.utils import get_state, format_currency, format_position
 from sklearn.preprocessing import MinMaxScaler
 from keras.models import load_model
 
-def train_model(agent, episode, data, episode_count = 50, batch_size = 32, window_size = 10):
+def train_model(agent, episode, data, episode_count = 50, batch_size = 32, window_size = 10, mode = None):
   total_profit = 0
   num_observations = len(data) - 1
 
@@ -14,11 +14,11 @@ def train_model(agent, episode, data, episode_count = 50, batch_size = 32, windo
   shares = []
   average_loss = []
 
-  state = get_state(data, 0, window_size + 1)
+  state = get_state(data, 0, window_size + 1, mode = mode)
 
   for t in tqdm(range(num_observations), total = num_observations, leave = True, desc = f'Episode {episode}/{episode_count}'):
     reward = 0
-    next_state = get_state(data, t + 1, window_size + 1)
+    next_state = get_state(data, t + 1, window_size + 1, mode = mode)
     action = agent.action(state)
 
     if action == 1:
@@ -48,7 +48,7 @@ def train_model(agent, episode, data, episode_count = 50, batch_size = 32, windo
   return (episode, episode_count, total_profit, np.array(average_loss).mean())
 
 
-def evaluate_model(agent, data, window_size, verbose):
+def evaluate_model(agent, data, window_size, verbose, mode = None):
   total_profit = 0
   num_observations = len(data) - 1
 
@@ -56,11 +56,11 @@ def evaluate_model(agent, data, window_size, verbose):
   history = []
   agent.inventory = []
 
-  state = get_state(data, 0, window_size + 1)
+  state = get_state(data, 0, window_size + 1, mode = mode)
 
   for t in range(num_observations):
     reward = 0
-    next_state = get_state(data, t + 1, window_size + 1)
+    next_state = get_state(data, t + 1, window_size + 1, mode = mode)
 
     action = agent.action(state, eval = True)
 
