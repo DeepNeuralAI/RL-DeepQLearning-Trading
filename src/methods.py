@@ -3,8 +3,9 @@ import logging
 import numpy as np
 from tqdm import tqdm
 from src.utils import get_state, format_currency, format_position, normalize
+import pdb
 
-def train_model(agent, episode, data, episode_count = 50, batch_size = 32):
+def train_model(agent, episode, data, episode_count = 50, batch_size = 32, window_size = 10):
   total_profit = 0
   num_observations = len(data) - 1
 
@@ -15,6 +16,7 @@ def train_model(agent, episode, data, episode_count = 50, batch_size = 32):
   normed_data = normalize(data)
 
   state = get_state(normed_data, 0)
+
 
   for t in tqdm(range(num_observations), total = num_observations, leave = True, desc = f'Episode {episode}/{episode_count}'):
     reward = 0
@@ -49,7 +51,7 @@ def train_model(agent, episode, data, episode_count = 50, batch_size = 32):
   return (episode, episode_count, total_profit, np.array(average_loss).mean())
 
 
-def evaluate_model(agent, data, verbose):
+def evaluate_model(agent, data, verbose, window_size = 10):
   total_profit = 0
   num_observations = len(data) - 1
 

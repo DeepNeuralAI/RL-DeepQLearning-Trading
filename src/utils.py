@@ -12,6 +12,8 @@ from .technical_indicators import (
   add_volume_indicators
 )
 
+import pdb
+
 def timestamp():
   return round(dt.datetime.now().timestamp())
 
@@ -36,13 +38,7 @@ def sigmoid(x):
   return 1 / (1 + math.exp(-x))
 
 def get_state(data, t):
-  return np.array(data.iloc[t]).reshape(1, data.shape[1])
-  # d = t - n_days + 1
-  # block = data[d: t + 1] if d >= 0 else -d * [data[0]] + data[0: t + 1]  # pad with t0
-  # res = []
-  # for i in range(n_days - 1):
-  #     res.append(sigmoid(block[i + 1] - block[i]))
-  # return np.array([res])
+  return np.array([data.iloc[t]])
 
 def show_training_result(result, val_position):
   if val_position != 0.0:

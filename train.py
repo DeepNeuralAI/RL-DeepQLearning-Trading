@@ -16,10 +16,10 @@ def run(training_stock, validation_stock, window_size, batch_size, episode_count
   validation_data = add_technical_features(load_data(validation_stock), window = window_size)
 
   num_features = training_data.shape[1]
-  agent = RLAgent(num_features, model_type = model_type, model_name = model_name)
+  agent = RLAgent(state_size = num_features, model_type = model_type, model_name = model_name, window_size = window_size)
 
   for episode in range(1, episode_count + 1):
-    training_result = train_model(agent, episode, training_data, episode_count = episode_count, batch_size = batch_size)
+    training_result = train_model(agent, episode, training_data, episode_count = episode_count, batch_size = batch_size, window_size = window_size)
     validation_result, _, shares = evaluate_model(agent, validation_data, verbose)
     show_training_result(training_result, validation_result)
 
