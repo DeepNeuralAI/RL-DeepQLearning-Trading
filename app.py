@@ -7,6 +7,9 @@ from src.agent import RLAgent
 from src.utils import get_stock_data
 from main.utils.plotting import visualize
 
+import keras.backend.tensorflow_backend as tb
+tb._SYMBOLIC_SCOPE.value = True
+
 @st.cache
 def load_data(symbol):
   temp = pd.read_csv(f'data/{symbol}.csv')
@@ -28,7 +31,7 @@ def load_data(symbol):
 def load_model(state_size, model_name):
   return RLAgent(state_size = window_size, pretrained = True, model_name = model_name)
 
-def evaluate(test_data, window_size, verbose = True):
+def evaluate(agent, test_data, window_size, verbose = True):
   result, history, shares = evaluate_model(agent, test_data, window_size, verbose)
   return result, history, shares
 
@@ -50,17 +53,23 @@ def filter_data_by_date(data, start_date, end_date):
   return data.loc[date_range].dropna()
 
 if submit:
-  filtered_data = filter_data_by_date(data, start_date, end_date)
-  st.write(filtered_data)
-  trades = st.checkbox('Show Trades')
+  # filtered_data = filter_data_by_date(data, start_date, end_date)
+  test_stock = 'data/GOOG_2019.csv'
+  test_data = get_stock_data(test_stock)
+  window_size = 10
+  agent = load_model(state_size = window_size, model_name = 'model_double-dqn_GOOG_50' )
+  result, history, shares = evaluate(agent, test_data, window_size = window_size)
+  # st.write(filtered_data)
+  # trades = st.checkbox('Show Trades')
+  # chart = visualize(df, history)
+  # st.altair_chart(chart)
 
-# chart = visualize(df, history)
-# st.altair_chart(chart)
+
 
 
 # model_name = 'model_double-dqn_GOOG_50'
-# test_stock = 'data/GOOG_2019.csv'
-# window_size = 10
+#
+#
 # verbose = True
 
-# test_data = get_stock_data(test_stock)
+#
