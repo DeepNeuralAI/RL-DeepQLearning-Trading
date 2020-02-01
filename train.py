@@ -9,6 +9,7 @@ from src.methods import train_model, evaluate_model
 from src.agent import RLAgent
 from tensorboardX import SummaryWriter
 import os
+os.environ['KMP_DUPLICATE_LIB_OK']='True'
 import pdb
 
 
@@ -47,6 +48,7 @@ if __name__ == '__main__':
   parser.add_argument('--model-name')
   parser.add_argument('--pretrained', default = False)
   parser.add_argument('--verbose', default = False)
+  parser.add_argument('--mode')
 
   args = parser.parse_args()
 
@@ -56,6 +58,7 @@ if __name__ == '__main__':
   window_size = int(args.window_size)
   batch_size = int(args.batch_size)
   episode_count = int(args.episode_count)
+  mode = args.mode
 
   model_name = args.model_name
   pretrained = args.pretrained

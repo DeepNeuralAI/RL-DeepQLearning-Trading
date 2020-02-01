@@ -6,7 +6,6 @@ from src.utils import get_state, format_currency, format_position, normalize
 from tensorboardX import SummaryWriter
 import pdb
 
-
 def train_model(agent, episode, data, episode_count = 50, batch_size = 32, window_size = 10):
   total_profit = 0
   num_observations = len(data) - 1

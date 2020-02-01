@@ -26,6 +26,7 @@ if __name__ == "__main__":
   parser.add_argument('--window-size', default = 10)
   parser.add_argument('--model-name')
   parser.add_argument('--verbose', default = False)
+  parser.add_argument('--mode')
 
 
   args = parser.parse_args()
@@ -34,6 +35,7 @@ if __name__ == "__main__":
   window_size = int(args.window_size)
   model_name = args.model_name
   verbose = args.verbose
+  mode = args.mode
 
   coloredlogs.install(level="DEBUG")
 
