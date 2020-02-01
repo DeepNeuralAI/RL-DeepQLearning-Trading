@@ -53,16 +53,10 @@ def filter_data_by_date(data, start_date, end_date):
   return data.loc[date_range].dropna()
 
 if submit:
-  # filtered_data = filter_data_by_date(data, start_date, end_date)
-  test_stock = 'data/GOOG_2019.csv'
-  test_data = get_stock_data(test_stock)
-  window_size = 10
-  agent = load_model(state_size = window_size, model_name = 'model_double-dqn_GOOG_50' )
-  result, history, shares = evaluate(agent, test_data, window_size = window_size)
-  # st.write(filtered_data)
-  # trades = st.checkbox('Show Trades')
-  # chart = visualize(df, history)
-  # st.altair_chart(chart)
+  filtered_data = filter_data_by_date(data, start_date, end_date)
+
+  st.write(filtered_data)
+  trades = st.checkbox('Show Trades')
 
 
 
@@ -71,5 +65,13 @@ if submit:
 #
 #
 # verbose = True
+
+# test_stock = 'data/GOOG_2019.csv'
+# test_data = get_stock_data(test_stock)
+# window_size = 10
+# agent = load_model(state_size = window_size, model_name = 'model_double-dqn_GOOG_50' )
+# result, history, shares = evaluate(agent, test_data, window_size = window_size)
+# chart = visualize(df, history)
+# st.altair_chart(chart)
 
 #
