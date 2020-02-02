@@ -38,23 +38,6 @@ def get_csv(symbol):
 	loop = asyncio.get_event_loop()
 	loop.run_until_complete(query_api(symbol))
 
-def get_path(symbol, base_dir=None):
-	if base_dir is None:
-		base_dir = os.environ.get('PWD')
-	return os.path.join(base_dir, f'data/daily_adjusted_{symbol}.csv')
-
-def load_data(symbol, addSPY=True, column_name = 'adjusted_close'):
-	temp = pd.read_csv(get_path(symbol), index_col = 'timestamp', parse_dates=True,
-		usecols=['timestamp', column_name, 'high', 'close', 'open', 'low', 'volume'], na_values=['nan'])
-	temp.rename(columns={f'{column_name}': symbol}, inplace=True)
-
-	if addSPY and symbol is not 'SPY':
-		SPY = pd.read_csv(get_path('SPY'),index_col = 'timestamp',
-			parse_dates=True, usecols=['timestamp', column_name], na_values=['nan'])
-		SPY.rename(columns={f'{column_name}': 'SPY'}, inplace=True)
-		temp = temp.join(SPY['SPY']).dropna(subset=["SPY"]).drop('SPY', axis = 1)
-	return temp
-
 if __name__ == "__main__":
 	pass
 	# df = load_data(['GOOG'], dates=pd.date_range(dt.datetime(2018,1,1), dt.datetime(2018,12,31)))

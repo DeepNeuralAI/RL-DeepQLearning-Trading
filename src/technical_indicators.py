@@ -2,13 +2,6 @@ import pandas as pd
 import numpy as np
 import ta
 
-
-def add_technical_features(data):
-  data = ta.utils.dropna(data)
-  return ta.add_all_ta_features(
-    data, open="open", high="high", low="low", close="adjusted_close",
-    volume="volume", fillna=True)
-
 def add_momentum_indicators(high, low, close, volume, n_period = 7, fillna=True):
 	"""
 	Money Flow Index (MFI)
@@ -150,3 +143,23 @@ def bollinger_bands(prices, sma):
 def bollinger_band_pct(prices, sma):
 	lower, upper = bollinger_bands(prices, sma)
 	return (prices - lower) / (upper - lower)
+
+def indicators_dict(data, window = 7):
+  prices = data.adjusted_close
+  volume = data.volume
+  return {
+    'price': prices,
+    'trend_rsi': relative_strength_index(prices, window),
+    'mom_moms': momentum(prices, window),
+    'trend_stok': stochastic_oscillator_k(prices, window),
+    'trend_stod': stochastic_oscillator_d(prices, window),
+    'volume_obv': on_balance_volume(prices, volume),
+    'trend_sma': simple_moving_average(prices, window),
+    'trend_p2sma': price_to_sma(prices, simple_moving_average(prices, window)),
+    'trend_ema': exponential_moving_average(prices, window),
+    'trend_p2ema': price_to_ema(prices, exponential_moving_average(prices)),
+    'trend_macd': moving_average_convergence_divergence(prices),
+    'vol_bbl': bollinger_bands(prices, simple_moving_average(prices))[0],
+    'vol_bbh': bollinger_bands(prices, simple_moving_average(prices))[1],
+    'vol_bbp': bollinger_band_pct(prices, simple_moving_average(prices))
+  }
