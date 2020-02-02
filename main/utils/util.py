@@ -1,10 +1,10 @@
-from technical_indicators import *
-from get_data import load_data, get_path
+from .technical_indicators import *
 
-def indicators_dict(symbol, prices, volume, window = 7):
+def indicators_dict(data, window = 7):
+  prices = data.adjusted_close
+  volume = data.volume
   return {
-    f'{symbol}': prices,
-    f'{symbol}_norm': normalize(prices),
+    'price': prices,
     'trend_rsi': relative_strength_index(prices, window),
     'mom_moms': momentum(prices, window),
     'trend_stok': stochastic_oscillator_k(prices, window),
@@ -20,20 +20,36 @@ def indicators_dict(symbol, prices, volume, window = 7):
     'vol_bbp': bollinger_band_pct(prices, simple_moving_average(prices))
   }
 
+def get_path(symbol, base_dir=None):
+	if base_dir is None:
+		base_dir = os.environ.get('PWD')
+	return os.path.join(base_dir, f'data/{symbol}.csv')
+
+def load_data(symbol, addSPY=True, column_name = 'adjusted_close'):
+	temp = pd.read_csv(get_path(symbol), index_col = 'timestamp', parse_dates=True,
+		usecols=['timestamp', column_name, 'high', 'close', 'open', 'low', 'volume'], na_values=['nan'])
+	temp.rename(columns={f'{column_name}': symbol}, inplace=True)
+
+	if addSPY and symbol is not 'SPY':
+		SPY = pd.read_csv(get_path('SPY'),index_col = 'timestamp',
+			parse_dates=True, usecols=['timestamp', column_name], na_values=['nan'])
+		SPY.rename(columns={f'{column_name}': 'SPY'}, inplace=True)
+		temp = temp.join(SPY['SPY']).dropna(subset=["SPY"]).drop('SPY', axis = 1)
+	return temp
+
 def create_df(data, index):
   df = pd.DataFrame(index = index)
   for key in data.keys(): df[key] = data[key]
   return df
 
-def data_df(symbol, n_period = 7, fillna = True):
-  data = load_data(symbol)
+def data_df(symbol, n_period = 7, fillna = True, addSPY = False):
+  data = load_data(symbol, addSPY)
   inds = indicators_dict(symbol, data[symbol], data.volume, window = n_period)
   df = create_df(inds, data.index)
 
   high, low, close, volume = data.high, data.low, data.close, data.volume
   df = df.join(add_momentum_indicators(high, low, close, volume, n_period, fillna))
   df = df.join(add_trend_indicators(high, low, close, volume, n_period, fillna))
-  df.drop('trend_mi', axis = 1, inplace = True)
   df = df.join(add_volatility_indicators(high, low, close, n_period, fillna))
   df = df.join(add_volume_indicators(high, low, close, volume, n_period, fillna))
   return df
@@ -42,7 +58,6 @@ def holdings_df(trades, starting_balance):
   holdings = trades.copy()
   holdings['Cash'][0] += starting_balance
   return holdings.cumsum()
-
 
 def stock_value_df(prices, holdings):
   holdings_ = holdings.drop('Cash', axis = 1)

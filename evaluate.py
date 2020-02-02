@@ -2,21 +2,22 @@ import argparse
 from src.utils import get_stock_data
 from src.agent import RLAgent
 from src.methods import evaluate_model
-from src.utils import show_evaluation_result
+from src.utils import show_evaluation_result, load_data, add_technical_features
 import os
 import coloredlogs
 import keras.backend as K
 import logging
+import pdb
 
 
 def run(eval_stock, window_size, model_name, verbose):
-  data = get_stock_data(eval_stock)
-  initial_offset = data[1] - data[0]
+  data = add_technical_features(load_data(eval_stock), window = window_size)
+  num_features = data.shape[1]
 
   if model_name is not None:
-    agent = RLAgent(window_size, pretrained=True, model_name=model_name)
-    profit, history, shares = evaluate_model(agent, data, window_size, verbose)
-    show_evaluation_result(profit, initial_offset)
+    agent = RLAgent(num_features, pretrained=True, model_name=model_name)
+    profit, history, shares = evaluate_model(agent, data, verbose)
+    show_evaluation_result(model_name, profit)
 
 
 if __name__ == "__main__":
@@ -26,6 +27,7 @@ if __name__ == "__main__":
   parser.add_argument('--model-name')
   parser.add_argument('--verbose', default = False)
   parser.add_argument('--mode')
+
 
   args = parser.parse_args()
 

@@ -4,40 +4,38 @@ import coloredlogs
 from docopt import docopt
 import datetime as dt
 import keras.backend as K
-import numpy as np
-
-from src.utils import timestamp, show_training_result, get_stock_data
+from src.utils import timestamp, show_training_result, load_data, add_technical_features
 from src.methods import train_model, evaluate_model
 from src.agent import RLAgent
-from src.rnn import RNN
+from tensorboardX import SummaryWriter
 import os
 os.environ['KMP_DUPLICATE_LIB_OK']='True'
 import pdb
 
 
-def run(training_stock, validation_stock, window_size, batch_size, episode_count, model_type="ddqn", model_name = None, pretrained = False, verbose = False, mode = None):
+def run(training_stock, validation_stock, window_size, batch_size, episode_count, model_type="ddqn", model_name = None, pretrained = False, verbose = False):
+  writer = SummaryWriter()
+  training_data = add_technical_features(load_data(training_stock), window = window_size)
+  validation_data = add_technical_features(load_data(validation_stock), window = window_size)
 
-
-  training_data = get_stock_data(training_stock)
-  validation_data = get_stock_data(validation_stock)
-
-  # if mode == 'rnn':
-  #   if model_name is None:
-  #     data_ = np.array(training_data) / np.array(training_data)[0]
-  #     rnn = RNN(data_, lag = window_size, horizon = window_size, epochs = 100)
-  #     rnn.train()
-  #     rnn.model.save('models/rnn_100')
-  #     print('Saved..')
-  #     return
-
-  agent = RLAgent(window_size, model_type = model_type, model_name = model_name)
-
-  initial_offset = validation_data[1] - validation_data[0]
+  num_features = training_data.shape[1]
+  agent = RLAgent(state_size = num_features, model_type = model_type, model_name = model_name, window_size = window_size)
 
   for episode in range(1, episode_count + 1):
     training_result = train_model(agent, episode, training_data, episode_count = episode_count, batch_size = batch_size, window_size = window_size)
-    validation_result, _, shares = evaluate_model(agent, validation_data, window_size, verbose)
-    show_training_result(training_result, validation_result, initial_offset)
+    pdb.set_trace()
+    writer.add_scalar('train/reward', training_result[2], episode)
+    writer.add_scalar('train/loss', training_result[-1], episode)
+
+    validation_result, _, shares = evaluate_model(agent, validation_data, verbose)
+    writer.add_scaler('valid/reward', validation_result[2], episode)
+    writer.add_scaler('valid/loss', validation_result[-1], episode)
+
+    show_training_result(training_result, validation_result)
+
+
+
+  writer.close()
 
 if __name__ == '__main__':
   parser = argparse.ArgumentParser(description='Deep RL in Algo Trading')

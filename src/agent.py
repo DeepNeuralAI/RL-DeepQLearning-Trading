@@ -9,9 +9,10 @@ from keras.layers import Dense
 from keras.optimizers import Adam
 from tensorflow.keras.losses import Huber
 from src.utils import timestamp
+import pdb
 
 class RLAgent:
-  def __init__(self, state_size, model_type = 'ddqn', pretrained = False, model_name = None, reset_target_weight_interval = 100):
+  def __init__(self, state_size, model_type = 'ddqn', pretrained = False, model_name = None, window_size = 10, reset_target_weight_interval = 100):
     self.model_type = model_type
 
     self.state_size = state_size
@@ -27,8 +28,9 @@ class RLAgent:
     self.radr = 0.995 # Random Action Decay Rate
     self.lr = 0.001
     self.loss = Huber
-    self.custom_objects = {"huber_loss": Huber()}
+    self.custom_objects = {"huber": Huber}
     self.optimizer = Adam(lr = self.lr)
+    self.window_size = window_size
 
     if pretrained and self.model_name is not None:
       self.model = self.load()
@@ -41,8 +43,13 @@ class RLAgent:
     self.target_model = clone_model(self.model)
     self.target_model.set_weights(self.model.get_weights())
 
+
   def load(self):
-    return load_model(f"models/{self.model_name}", custom_objects = self.custom_objects, compile = False)
+    model = load_model(f"models/{self.model_name}", custom_objects = self.custom_objects, compile=False)
+    model.compile(optimizer = self.optimizer, loss = self.loss())
+    return model
+
+
 
   def save(self, episode):
     if self.model_name is None:
@@ -51,10 +58,10 @@ class RLAgent:
 
   def model_(self):
     model = Sequential()
-    model.add(Dense(units=128, activation="relu", input_dim=self.state_size))
+    model.add(Dense(units=256, activation="relu", input_shape=(self.state_size,)))
+    model.add(Dense(units=512, activation="relu"))
+    model.add(Dense(units=512, activation="relu"))
     model.add(Dense(units=256, activation="relu"))
-    model.add(Dense(units=256, activation="relu"))
-    model.add(Dense(units=128, activation="relu"))
     model.add(Dense(units=self.action_size))
 
     model.compile(optimizer = self.optimizer, loss = self.loss())
@@ -80,6 +87,9 @@ class RLAgent:
         self.target_model.set_weights(self.model.get_weights())
 
       for state, action, reward, next_state, done in mini_batch:
+        # next_state = next_state.reshape(1,33)
+        # state = state.reshape(1,33)
+
         if done:
           target = reward
         else:
@@ -87,7 +97,6 @@ class RLAgent:
 
         q_values = self.model.predict(state)
         q_values[0][action] = target
-
         X_train.append(state[0])
         y_train.append(q_values[0])
 
@@ -100,6 +109,7 @@ class RLAgent:
       epochs = 1,
       verbose = 0
     ).history["loss"][0]
+
 
     return loss
 
