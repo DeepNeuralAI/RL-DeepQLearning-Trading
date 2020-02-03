@@ -49,8 +49,6 @@ class RLAgent:
     model.compile(optimizer = self.optimizer, loss = self.loss())
     return model
 
-
-
   def save(self, episode):
     if self.model_name is None:
       self.model_name = f'{self.model_type}_{timestamp()}'
@@ -67,12 +65,12 @@ class RLAgent:
     model.compile(optimizer = self.optimizer, loss = self.loss())
     return model
 
-  def action(self, state, eval = False):
+  def action(self, state, evaluation = False):
     if self.start:
       self.start = False
       return 1
 
-    if not eval and (random.random() <= self.rar):
+    if not evaluation and (random.random() <= self.rar):
       return random.randrange(self.action_size)
 
     action_probs = self.model.predict(state)

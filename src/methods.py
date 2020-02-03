@@ -66,7 +66,7 @@ def evaluate_model(agent, data, verbose, window_size = 10):
     reward = 0
     next_state = get_state(normed_data, t + 1)
 
-    action = agent.action(state, eval = True)
+    action = agent.action(state, evaluation = True)
 
     if action == 1:
       agent.inventory.append(data.price[t])

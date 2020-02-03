@@ -49,11 +49,9 @@ def show_training_result(result, val_position):
   if val_position != 0.0:
     logging.info(f'Episode {result[0]}/{result[1]} - Train Position: {format_position(result[2])}  Val Position: {format_position(val_position)}  Train Loss: {result[3]})')
 
-
-
 def show_evaluation_result(model_name, profit):
   if profit != 0.0:
-    logging.info(f'{model_name}: {format_position(profit)}\n')
+    logging.info(f'{format_position(profit)}\n')
 
 # def show_evaluation_result(profit, initial_offset):
 #   if profit != initial_offset and profit != 0.0:
