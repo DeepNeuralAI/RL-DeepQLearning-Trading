@@ -25,11 +25,11 @@ def run(training_stock, validation_stock, window_size, batch_size, episode_count
     # writer.add_scalar('train/reward', training_result[2], episode)
     # writer.add_scalar('train/loss', training_result[-1], episode)
 
-    validation_result, _, shares = evaluate_model(agent, validation_data, verbose)
+    validation_profit, history, shares, cum_return = evaluate_model(agent, validation_data, verbose)
     # writer.add_scaler('valid/reward', validation_result[2], episode)
     # writer.add_scaler('valid/loss', validation_result[-1], episode)
 
-    show_training_result(training_result, validation_result)
+    show_training_result(training_result, validation_profit)
   # writer.close()
 
 if __name__ == '__main__':

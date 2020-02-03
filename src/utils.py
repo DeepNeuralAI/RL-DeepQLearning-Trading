@@ -14,8 +14,6 @@ from .technical_indicators import (
   add_volume_indicators
 )
 
-import pdb
-
 def timestamp():
   return round(dt.datetime.now().timestamp())
 
@@ -24,7 +22,6 @@ def format_position(price):
     return f'-${abs(price)}'
   else:
     return f'+${abs(price)}'
-
 
 def normalize(df):
   result = df.copy()
@@ -49,7 +46,7 @@ def show_training_result(result, val_position):
   if val_position != 0.0:
     logging.info(f'Episode {result[0]}/{result[1]} - Train Position: {format_position(result[2])}  Val Position: {format_position(val_position)}  Train Loss: {result[3]})')
 
-def show_evaluation_result(model_name, profit):
+def show_evaluation_result(profit):
   if profit != 0.0:
     logging.info(f'{format_position(profit)}\n')
 

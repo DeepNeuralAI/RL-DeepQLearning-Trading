@@ -85,9 +85,6 @@ class RLAgent:
         self.target_model.set_weights(self.model.get_weights())
 
       for state, action, reward, next_state, done in mini_batch:
-        # next_state = next_state.reshape(1,33)
-        # state = state.reshape(1,33)
-
         if done:
           target = reward
         else:

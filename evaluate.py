@@ -16,8 +16,8 @@ def run(eval_stock, window_size, model_name, verbose):
 
   if model_name is not None:
     agent = RLAgent(num_features, pretrained=True, model_name=model_name)
-    profit, history, shares = evaluate_model(agent, data, verbose)
-    show_evaluation_result(model_name, profit)
+    profit, history, shares, cum_return = evaluate_model(agent, data, verbose)
+    show_evaluation_result(profit)
 
 
 if __name__ == "__main__":
@@ -25,8 +25,7 @@ if __name__ == "__main__":
   parser.add_argument('--eval')
   parser.add_argument('--window-size', default = 10)
   parser.add_argument('--model-name')
-  parser.add_argument('--verbose', default = False)
-  parser.add_argument('--mode')
+  parser.add_argument('--verbose', default = True)
 
 
   args = parser.parse_args()
@@ -35,7 +34,6 @@ if __name__ == "__main__":
   window_size = int(args.window_size)
   model_name = args.model_name
   verbose = args.verbose
-  mode = args.mode
 
   coloredlogs.install(level="DEBUG")
 
