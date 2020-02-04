@@ -80,7 +80,7 @@ def train_model(agent, episode, data, episode_count = 50, batch_size = 32, windo
       loss = agent.replay(batch_size)
       average_loss.append(loss)
 
-    if episode % 50 == 0:
+    if episode % 10 == 0:
       agent.save(episode)
 
     if done: return (episode, episode_count, total_profit, np.array(average_loss).mean())
