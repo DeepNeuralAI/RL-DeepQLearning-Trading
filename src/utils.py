@@ -14,8 +14,6 @@ from .technical_indicators import (
   add_volume_indicators
 )
 
-import pdb
-
 def timestamp():
   return round(dt.datetime.now().timestamp())
 
@@ -24,7 +22,6 @@ def format_position(price):
     return f'-${abs(price)}'
   else:
     return f'+${abs(price)}'
-
 
 def normalize(df):
   result = df.copy()
@@ -40,25 +37,14 @@ def format_currency(price):
 def sigmoid(x):
   return 1 / (1 + math.exp(-x))
 
-
 def get_state(data, t):
   return np.array([data.iloc[t]])
 
-
 def show_training_result(result, val_position):
-  if val_position != 0.0:
-    logging.info(f'Episode {result[0]}/{result[1]} - Train Position: {format_position(result[2])}  Val Position: {format_position(val_position)}  Train Loss: {result[3]})')
+  logging.info(f'Episode {result[0]}/{result[1]} - Train Position: {format_position(result[2])}  Val Position: {format_position(val_position)}  Train Loss: {result[3]})')
 
-
-
-def show_evaluation_result(model_name, profit):
-  if profit != 0.0:
-    logging.info(f'{model_name}: {format_position(profit)}\n')
-
-# def show_evaluation_result(profit, initial_offset):
-#   if profit != initial_offset and profit != 0.0:
-#     logging.info(f'{format_position(profit)}\n')
-
+def show_evaluation_result(profit):
+  logging.info(f'{format_position(profit)}\n')
 
 def get_stock_data(stock_file):
   df = pd.read_csv(stock_file)
@@ -76,6 +62,7 @@ def load_data(path):
   else:
       temp.index = temp['timestamp']
       temp.index = pd.to_datetime(temp.index, infer_datetime_format=True)
+      temp.index.name = 'Date'
       temp.drop('timestamp', axis = 1, inplace = True)
 
   temp = temp.loc[:, ['adjusted_close', 'high', 'close', 'open', 'low', 'volume']]
