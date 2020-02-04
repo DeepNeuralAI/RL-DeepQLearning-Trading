@@ -140,7 +140,7 @@ submit = st.sidebar.button('Run')
 
 
 if submit:
-  model_name = 'ddqn_1580836510_10'
+  model_name = 'GOOG'
   data = load_data_(symbol, window_size)
   filtered_data = filter_data_by_date(data, start_date, end_date)
   st.write(filtered_data)
