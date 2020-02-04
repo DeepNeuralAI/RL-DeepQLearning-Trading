@@ -6,7 +6,7 @@ from src.utils import get_state, format_currency, format_position, normalize
 from tensorboardX import SummaryWriter
 import pdb
 
-def train_model(agent, episode, data, episode_count = 50, batch_size = 32, window_size = 10, mode = None):
+def train_model(agent, episode, data, episode_count = 50, batch_size = 32, window_size = 10):
   total_profit = 0
   num_observations = len(data)
 
@@ -25,30 +25,32 @@ def train_model(agent, episode, data, episode_count = 50, batch_size = 32, windo
     if action == 1: # Buy
       agent.inventory.append(data.price[t])
       shares.append(1)
-      reward -= 0.1 # Commission Penalty
+      reward -= 1e-5 # Commission Penalty
+
     elif action == 2 and len(agent.inventory) > 0: # Sell
       purchase_price = agent.inventory.pop(0)
       delta = data.price[t] - purchase_price
-      reward = delta - 0.1 # Commission Penalty
+      reward = delta - 1e-5 # Commission Penalty
       total_profit += delta
       shares.append(-1)
+
     else: # Hold
       shares.append(0)
-
-    if len(agent.memory) > batch_size:
-      loss = agent.replay(batch_size)
-      average_loss.append(loss)
+      reward -= 1e-3
 
     if not done:
       next_state = get_state(normed_data, t + 1)
       agent.remember(state, action, reward, next_state, done)
       state = next_state
 
+    if len(agent.memory) > batch_size:
+      loss = agent.replay(batch_size)
+      average_loss.append(loss)
+
     if episode % 10 == 0:
       agent.save(episode)
 
-    if done:
-      return (episode, episode_count, total_profit, np.array(average_loss).mean())
+    if done: return (episode, episode_count, total_profit, np.array(average_loss).mean())
 
 def evaluate_model(agent, data, verbose, window_size = 10):
   total_profit = 0
@@ -64,8 +66,11 @@ def evaluate_model(agent, data, verbose, window_size = 10):
     done = t == (num_observations - 1)
     reward = 0
 
-    state = get_state(normed_data, 0)
+    state = get_state(normed_data, t)
     action = agent.action(state, evaluation = True)
+
+
+    print(action)
 
     if action == 1:
       agent.inventory.append(data.price[t])
@@ -96,7 +101,6 @@ def evaluate_model(agent, data, verbose, window_size = 10):
       agent.memory.append((state, action, reward, next_state, done))
       state = next_state
 
-    if done:
-      return total_profit, history, shares, cum_return
+    if done: return total_profit, history, shares, cum_return
 
 

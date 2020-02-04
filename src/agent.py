@@ -12,7 +12,7 @@ from src.utils import timestamp
 import pdb
 
 class RLAgent:
-  def __init__(self, state_size, model_type = 'ddqn', pretrained = False, model_name = None, window_size = 10, reset_target_weight_interval = 100):
+  def __init__(self, state_size, model_type = 'ddqn', pretrained = False, model_name = None, window_size = 10, reset_target_weight_interval = 10):
     self.model_type = model_type
 
     self.state_size = state_size
@@ -22,11 +22,11 @@ class RLAgent:
     self.start = True
 
     self.model_name = model_name
-    self.gamma = 0.95
-    self.rar = 1.0 # Epsilon / Random Action Rate
+    self.gamma = 0.99
+    self.rar = 0.99 # Epsilon / Random Action Rate
     self.eps_min = 0.01
     self.radr = 0.995 # Random Action Decay Rate
-    self.lr = 0.001
+    self.lr = 1e-5
     self.loss = Huber
     self.custom_objects = {"huber": Huber}
     self.optimizer = Adam(lr = self.lr)
@@ -74,6 +74,9 @@ class RLAgent:
       return random.randrange(self.action_size)
 
     action_probs = self.model.predict(state)
+
+    if evaluation:
+      print(action_probs[0])
     return np.argmax(action_probs[0])
 
   def replay(self, batch_size):
@@ -104,7 +107,6 @@ class RLAgent:
       epochs = 1,
       verbose = 0
     ).history["loss"][0]
-
 
     return loss
 

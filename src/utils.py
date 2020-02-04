@@ -37,23 +37,14 @@ def format_currency(price):
 def sigmoid(x):
   return 1 / (1 + math.exp(-x))
 
-
 def get_state(data, t):
   return np.array([data.iloc[t]])
 
-
 def show_training_result(result, val_position):
-  if val_position != 0.0:
-    logging.info(f'Episode {result[0]}/{result[1]} - Train Position: {format_position(result[2])}  Val Position: {format_position(val_position)}  Train Loss: {result[3]})')
+  logging.info(f'Episode {result[0]}/{result[1]} - Train Position: {format_position(result[2])}  Val Position: {format_position(val_position)}  Train Loss: {result[3]})')
 
 def show_evaluation_result(profit):
-  if profit != 0.0:
-    logging.info(f'{format_position(profit)}\n')
-
-# def show_evaluation_result(profit, initial_offset):
-#   if profit != initial_offset and profit != 0.0:
-#     logging.info(f'{format_position(profit)}\n')
-
+  logging.info(f'{format_position(profit)}\n')
 
 def get_stock_data(stock_file):
   df = pd.read_csv(stock_file)
