@@ -12,14 +12,16 @@ from tensorboardX import SummaryWriter
 import pdb
 
 def run(training_stock, validation_stock, window_size, batch_size, episode_count, model_type="ddqn", model_name = None, pretrained = False, verbose = False):
-  training_data = add_technical_features(load_data(training_stock), window = window_size)[::-1]
-  validation_data = add_technical_features(load_data(validation_stock), window = window_size)[::-1]
+  training_data = add_technical_features(load_data(training_stock), window = window_size).sort_values(by=['Date'], ascending=True)
+  validation_data = add_technical_features(load_data(validation_stock), window = window_size).sort_values(by=['Date'], ascending=True)
 
 
   num_features = training_data.shape[1]
   agent = RLAgent(state_size = num_features, model_type = model_type, model_name = model_name, window_size = window_size)
 
   for episode in range(1, episode_count + 1):
+    agent.n_iter += 1
+
     training_result = train_model(agent, episode, training_data, episode_count = episode_count, batch_size = batch_size, window_size = window_size)
     validation_profit, history, valid_shares = evaluate_model(agent, validation_data, verbose)
 

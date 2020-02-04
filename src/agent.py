@@ -82,6 +82,7 @@ class RLAgent:
 
     if self.model_type == 'ddqn':
       if self.n_iter % self.reset_interval == 0:
+        print("Setting Target Weights...")
         self.target_model.set_weights(self.model.get_weights())
 
       for state, action, reward, next_state, done in mini_batch:

@@ -62,6 +62,7 @@ def load_data(path):
   else:
       temp.index = temp['timestamp']
       temp.index = pd.to_datetime(temp.index, infer_datetime_format=True)
+      temp.index.name = 'Date'
       temp.drop('timestamp', axis = 1, inplace = True)
 
   temp = temp.loc[:, ['adjusted_close', 'high', 'close', 'open', 'low', 'volume']]

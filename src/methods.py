@@ -3,8 +3,12 @@ import logging
 import numpy as np
 from tqdm import tqdm
 from src.utils import get_state, format_currency, format_position, normalize
-from tensorboardX import SummaryWriter
 import pdb
+
+'''
+1. Move daily_pct_return to utils
+2. Move calc_reward to utils
+'''
 
 def daily_pct_change(prices, shift):
   pct_change = (prices.copy() / prices.copy().shift(periods = shift)) - 1
@@ -21,11 +25,10 @@ def train_model(agent, episode, data, episode_count = 50, batch_size = 32, windo
   agent.inventory = []
   shares_history = []
   average_loss = []
+
   net_holdings = 0
-
   normed_data = normalize(data)
-
-  pct_change = daily_pct_change(data.price, 10)
+  pct_change = daily_pct_change(data.price, window_size)
 
   for t in tqdm(range(num_observations), total = num_observations, leave = True, desc = f'Episode {episode}/{episode_count}'):
     done = t == (num_observations - 1)
@@ -77,7 +80,7 @@ def train_model(agent, episode, data, episode_count = 50, batch_size = 32, windo
       loss = agent.replay(batch_size)
       average_loss.append(loss)
 
-    if episode % 10 == 0:
+    if episode % 50 == 0:
       agent.save(episode)
 
     if done: return (episode, episode_count, total_profit, np.array(average_loss).mean())
