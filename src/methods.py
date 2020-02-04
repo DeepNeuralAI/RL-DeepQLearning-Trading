@@ -34,17 +34,17 @@ def train_model(agent, episode, data, episode_count = 50, batch_size = 32, windo
     action = agent.action(state)
 
     if action == 2 and net_holdings == 0:
-        shares = -100
-        net_holdings += -100
-    elif action == 2 and net_holdings == 100:
-        shares = -200
-        net_holdings += -200
+        shares = -10
+        net_holdings += -10
+    elif action == 2 and net_holdings == 10:
+        shares = -20
+        net_holdings += -20
     elif action == 1 and net_holdings == 0:
-        shares = 100
-        net_holdings += 100
-    elif action == 1 and net_holdings == -100:
-        shares = 200
-        net_holdings += 200
+        shares = 10
+        net_holdings += 10
+    elif action == 1 and net_holdings == -10:
+        shares = 20
+        net_holdings += 20
     else:
         shares = 0
     shares_history.append(shares)
@@ -102,22 +102,21 @@ def evaluate_model(agent, data, verbose, window_size = 10):
     state = get_state(normed_data, t)
     action = agent.action(state, evaluation = True)
 
-    print(action)
     if action == 2 and net_holdings == 0:
-      shares = -100
-      net_holdings += -100
+      shares = -10
+      net_holdings += -10
       history.append((data.price[t], "SELL"))
-    elif action == 2 and net_holdings == 100:
-      shares = -200
-      net_holdings += -200
+    elif action == 2 and net_holdings == 10:
+      shares = -20
+      net_holdings += -20
       history.append((data.price[t], "SELL"))
     elif action == 1 and net_holdings == 0:
-      shares = 100
-      net_holdings += 100
+      shares = 10
+      net_holdings += 10
       history.append((data.price[t], "BUY"))
-    elif action == 1 and net_holdings == -100:
-      shares = 200
-      net_holdings += 200
+    elif action == 1 and net_holdings == -10:
+      shares = 20
+      net_holdings += 20
       history.append((data.price[t], "BUY"))
     else:
       shares = 0

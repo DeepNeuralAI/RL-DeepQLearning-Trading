@@ -74,9 +74,6 @@ class RLAgent:
       return random.randrange(self.action_size)
 
     action_probs = self.model.predict(state)
-
-    if evaluation:
-      print(action_probs[0])
     return np.argmax(action_probs[0])
 
   def replay(self, batch_size):
