@@ -72,10 +72,6 @@ markdown=3.1.1=py37_0
 markupsafe=1.1.1=py37h0b31af3_0
 matplotlib=3.1.2=pypi_0
 mistune=0.8.4=py37h0b31af3_1000
-mkl=2019.4=233
-mkl-service=2.3.0=py37hfbe908c_0
-mkl_fft=1.0.15=py37h5e564d8_0
-mkl_random=1.1.0=py37ha771720_0
 more-itertools=8.2.0=py_0
 nbconvert=5.6.1=py37_0
 nbformat=5.0.4=py_0
