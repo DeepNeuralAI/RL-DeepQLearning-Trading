@@ -9,12 +9,6 @@ from src.utils import load_data, add_technical_features, show_evaluation_result,
 import plotly.express as px
 import plotly.graph_objects as go
 
-model_name = 'ddqn_1580836510_10'
-test_stock = 'data/GOOG.csv'
-window_size = 10
-verbose = True
-
-
 import keras.backend.tensorflow_backend as tb
 tb._SYMBOLIC_SCOPE.value = True
 
@@ -77,16 +71,25 @@ def plot_trades(data, trades, symbol):
     x=buy_x,
     y=buy_y,
     mode="markers",
-    marker = dict(size = 10, symbol = 5, color = 'green'),
+    opacity = 0.8,
+    marker = dict(size = 5, symbol = 0, color = 'lime',
+      line=dict(width=1,color='DarkSlateGrey')
+    ),
     name="Buy",
   ))
   fig.add_trace(go.Scatter(
     x=sell_x,
     y=sell_y,
     mode="markers",
-    marker = dict(size = 10, symbol = 6, color = 'red'),
+    marker = dict(size = 5, symbol = 2, color = 'red'),
     name="Sell",
   ))
+  fig.update_layout(
+    xaxis_title="<b>Date</b>",
+    yaxis_title='<b>Price</b>',
+    legend_title='<b> Action </b>',
+    template='plotly_white'
+  )
   return fig
 
 def plot_return(vals, symbol):
@@ -119,7 +122,7 @@ def sidebar(index):
 
 
 # Streamlit App
-
+window_size = 10
 st.title('DeepRL Trader')
 st.subheader('Model uses Double Deep Q Network to generate a policy of optimal trades')
 
@@ -146,8 +149,17 @@ if submit:
 
   cum_return, avg_daily_returns, std_daily_returns, sharpe_ratio = get_portfolio_stats(vals[symbol])
 
-
   st.write(f'### Total Return for {symbol}: ${returns}')
   fig = plot_trades(filtered_data, trades, symbol)
   st.plotly_chart(fig)
+
+  cum_return = '{:.2f}'.format(cum_return * 100)
+  avg_daily_returns = '{:.2f}'.format(avg_daily_returns * 100)
+  std_daily_returns = '{:.2f}'.format(std_daily_returns)
+  sharpe_ratio = '{:.2f}'.format(sharpe_ratio)
+
+  st.write(f'**Cumulative Return:** {cum_return}%')
+  st.write(f'**Average Daily Returns:** {avg_daily_returns}%')
+  st.write(f'**Std Deviation of Daily Returns:** {std_daily_returns}')
+  st.write(f'**Sharpe Ratio:** {sharpe_ratio}')
 
