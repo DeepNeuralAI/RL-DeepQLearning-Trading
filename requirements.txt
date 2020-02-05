@@ -98,7 +98,6 @@ statsmodels==0.11.0
 streamlit==0.53.0
 ta==0.5.11
 tensorboard==2.0.0
-tensorboardX==2.0+a7f3124
 tensorflow==2.0.0
 tensorflow-estimator==2.0.0
 termcolor==1.1.0
