@@ -4,7 +4,6 @@ import logging
 import pandas as pd
 import numpy as np
 import pdb
-from statsmodels.tsa.arima_model import ARIMA
 
 from .technical_indicators import (
   indicators_dict,
