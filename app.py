@@ -94,14 +94,6 @@ def plot_return(vals, symbol):
   return fig
 
 
-'''
-TODO:
-1. Push csv files to S3
-2. Push models to S3
-3. Plot in Plotly -> Streamlit
-
-'''
-
 @st.cache
 def load_data_(symbol, window_size):
   data_ = add_technical_features(load_data(f'data/{symbol}.csv'), window = window_size).sort_values(by=['Date'], ascending=True)
@@ -128,8 +120,8 @@ def sidebar(index):
 
 # Streamlit App
 
-st.title('Run Model')
-st.markdown('Subheading Here')
+st.title('DeepRL Trader')
+st.subheader('Model uses Double Deep Q Network to generate a policy of optimal trades')
 
 symbols = ['AAPL', 'AMZN', 'CRM', 'FB', 'GOOG', 'JNJ', 'JPM', 'MSFT', 'NFLX', 'SPY', 'V']
 symbol = st.sidebar.selectbox('Stock Symbol:', symbols)
@@ -140,10 +132,9 @@ submit = st.sidebar.button('Run')
 
 
 if submit:
-  model_name = 'GOOG'
+  model_name = symbol
   data = load_data_(symbol, window_size)
   filtered_data = filter_data_by_date(data, start_date, end_date)
-  st.write(filtered_data)
 
   agent = load_model(filtered_data.shape[1], model_name = model_name)
   result, history, shares = evaluate(agent, filtered_data, window_size = window_size, verbose = False)
@@ -151,30 +142,12 @@ if submit:
   trades = create_trades(shares, symbol, filtered_data.price, 0, 0)
   holdings = holdings_df(trades, start_val = 100_000)
   vals = pd.DataFrame(data = values_df(filtered_data.price, holdings)).rename(columns = {0: symbol})
-  st.write(vals)
+  returns = '{:.2f}'.format(vals[symbol][-1] - vals[symbol][0])
+
+  cum_return, avg_daily_returns, std_daily_returns, sharpe_ratio = get_portfolio_stats(vals[symbol])
+
+
+  st.write(f'### Total Return for {symbol}: ${returns}')
   fig = plot_trades(filtered_data, trades, symbol)
   st.plotly_chart(fig)
-  fig = plot_return(vals, symbol)
-  st.plotly_chart(fig)
 
-
-  # st.write(filtered_data)
-  # trades = st.checkbox('Show Trades')
-
-
-
-
-# model_name = 'model_double-dqn_GOOG_50'
-#
-#
-# verbose = True
-
-# test_stock = 'data/GOOG_2019.csv'
-# test_data = get_stock_data(test_stock)
-# window_size = 10
-# agent = load_model(state_size = window_size, model_name = 'model_double-dqn_GOOG_50' )
-# result, history, shares = evaluate(agent, test_data, window_size = window_size)
-# chart = visualize(df, history)
-# st.altair_chart(chart)
-
-#
