@@ -128,7 +128,7 @@ window_size = 10
 st.title('DeepRL Trader')
 st.subheader('Model uses Double Deep Q Network to generate a policy of optimal trades')
 
-symbols = ['AAPL', 'AMZN', 'CRM', 'FB', 'GOOG', 'JNJ', 'JPM', 'MSFT', 'NFLX', 'SPY', 'V']
+symbols = ['AAPL', 'AMZN', 'CRM', 'FB', 'GOOG', 'JNJ', 'JPM', 'MSFT', 'NFLX', 'SPY', 'TSLA', 'V']
 symbol = st.sidebar.selectbox('Stock Symbol:', symbols)
 
 index = load_data_(symbol, window_size).index
