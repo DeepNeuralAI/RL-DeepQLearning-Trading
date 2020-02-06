@@ -4,6 +4,8 @@ import numpy as np
 
 from src.methods import evaluate_model
 from src.agent import RLAgent
+from src.BaselineModel import BaselineModel
+
 
 from src.utils import load_data, add_technical_features, show_evaluation_result, normalize
 import plotly.express as px
@@ -153,13 +155,27 @@ if submit:
   fig = plot_trades(filtered_data, trades, symbol)
   st.plotly_chart(fig)
 
-  cum_return = '{:.2f}'.format(cum_return * 100)
-  avg_daily_returns = '{:.2f}'.format(avg_daily_returns * 100)
-  std_daily_returns = '{:.2f}'.format(std_daily_returns)
-  sharpe_ratio = '{:.2f}'.format(sharpe_ratio)
+  ## Benchmarking
 
-  st.write(f'**Cumulative Return:** {cum_return}%')
-  st.write(f'**Average Daily Returns:** {avg_daily_returns}%')
-  st.write(f'**Std Deviation of Daily Returns:** {std_daily_returns}')
-  st.write(f'**Sharpe Ratio:** {sharpe_ratio}')
+  baseline = BaselineModel(symbol, filtered_data, max_shares = 10)
+  baseline_trades = baseline.trades
+  baseline_vals = compute_portvals(filtered_data.price, baseline_trades)
+  cum_return_b, avg_daily_returns_b, std_daily_returns_b, sharpe_ratio_b = get_portfolio_stats(baseline_vals)
+
+  benchmark = pd.DataFrame(columns = ['Cumulative Return', 'Avg Daily Returns', 'Std Dev Daily Returns', 'Sharpe Ratio'], index = ['Buy & Hold', 'Double DQN'])
+
+  benchmark.loc['Double DQN']['Cumulative Return'] = cum_return * 100
+  benchmark.loc['Double DQN']['Avg Daily Returns'] = avg_daily_returns * 100
+  benchmark.loc['Double DQN']['Std Dev Daily Returns'] = std_daily_returns
+  benchmark.loc['Double DQN']['Sharpe Ratio'] = sharpe_ratio
+
+  benchmark.loc['Buy & Hold']['Cumulative Return'] = cum_return_b * 100
+  benchmark.loc['Buy & Hold']['Avg Daily Returns'] = avg_daily_returns_b * 100
+  benchmark.loc['Buy & Hold']['Std Dev Daily Returns'] = std_daily_returns_b
+  benchmark.loc['Buy & Hold']['Sharpe Ratio'] = sharpe_ratio_b
+
+
+  st.table(benchmark.astype('float64').round(4))
+
+
 
