@@ -76,9 +76,6 @@ protobuf==3.11.2
 ptyprocess==0.6.0
 pydeck==0.2.1
 Pygments==2.5.2
-pyobjc-core==6.1
-pyobjc-framework-Cocoa==6.1
-pyobjc-framework-FSEvents==6.1
 pyparsing==2.4.6
 pyrsistent==0.15.7
 python-dateutil==2.8.1
@@ -98,7 +95,6 @@ statsmodels==0.11.0
 streamlit==0.53.0
 ta==0.5.11
 tensorboard==2.0.0
-tensorboardX==2.0+a7f3124
 tensorflow==2.0.0
 tensorflow-estimator==2.0.0
 termcolor==1.1.0

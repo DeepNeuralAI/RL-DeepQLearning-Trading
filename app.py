@@ -9,12 +9,6 @@ from src.utils import load_data, add_technical_features, show_evaluation_result,
 import plotly.express as px
 import plotly.graph_objects as go
 
-model_name = 'ddqn_1580836510_10'
-test_stock = 'data/GOOG.csv'
-window_size = 10
-verbose = True
-
-
 import keras.backend.tensorflow_backend as tb
 tb._SYMBOLIC_SCOPE.value = True
 
@@ -77,30 +71,31 @@ def plot_trades(data, trades, symbol):
     x=buy_x,
     y=buy_y,
     mode="markers",
-    marker = dict(size = 10, symbol = 5, color = 'green'),
+    opacity = 0.8,
+    marker = dict(size = 5, symbol = 0, color = 'lime',
+      line=dict(width=1,color='DarkSlateGrey')
+    ),
     name="Buy",
   ))
   fig.add_trace(go.Scatter(
     x=sell_x,
     y=sell_y,
     mode="markers",
-    marker = dict(size = 10, symbol = 6, color = 'red'),
+    marker = dict(size = 5, symbol = 2, color = 'red'),
     name="Sell",
   ))
+  fig.update_layout(
+    xaxis_title="<b>Date</b>",
+    yaxis_title='<b>Price</b>',
+    legend_title='<b> Action </b>',
+    template='plotly_white'
+  )
   return fig
 
 def plot_return(vals, symbol):
   fig = px.line(vals, x=vals.index, y=symbol)
   return fig
 
-
-'''
-TODO:
-1. Push csv files to S3
-2. Push models to S3
-3. Plot in Plotly -> Streamlit
-
-'''
 
 @st.cache
 def load_data_(symbol, window_size):
@@ -127,9 +122,9 @@ def sidebar(index):
 
 
 # Streamlit App
-
-st.title('Run Model')
-st.markdown('Subheading Here')
+window_size = 10
+st.title('DeepRL Trader')
+st.subheader('Model uses Double Deep Q Network to generate a policy of optimal trades')
 
 symbols = ['AAPL', 'AMZN', 'CRM', 'FB', 'GOOG', 'JNJ', 'JPM', 'MSFT', 'NFLX', 'SPY', 'V']
 symbol = st.sidebar.selectbox('Stock Symbol:', symbols)
@@ -140,10 +135,9 @@ submit = st.sidebar.button('Run')
 
 
 if submit:
-  model_name = 'GOOG'
+  model_name = symbol
   data = load_data_(symbol, window_size)
   filtered_data = filter_data_by_date(data, start_date, end_date)
-  st.write(filtered_data)
 
   agent = load_model(filtered_data.shape[1], model_name = model_name)
   result, history, shares = evaluate(agent, filtered_data, window_size = window_size, verbose = False)
@@ -151,30 +145,21 @@ if submit:
   trades = create_trades(shares, symbol, filtered_data.price, 0, 0)
   holdings = holdings_df(trades, start_val = 100_000)
   vals = pd.DataFrame(data = values_df(filtered_data.price, holdings)).rename(columns = {0: symbol})
-  st.write(vals)
+  returns = '{:.2f}'.format(vals[symbol][-1] - vals[symbol][0])
+
+  cum_return, avg_daily_returns, std_daily_returns, sharpe_ratio = get_portfolio_stats(vals[symbol])
+
+  st.write(f'### Total Return for {symbol}: ${returns}')
   fig = plot_trades(filtered_data, trades, symbol)
   st.plotly_chart(fig)
-  fig = plot_return(vals, symbol)
-  st.plotly_chart(fig)
 
+  cum_return = '{:.2f}'.format(cum_return * 100)
+  avg_daily_returns = '{:.2f}'.format(avg_daily_returns * 100)
+  std_daily_returns = '{:.2f}'.format(std_daily_returns)
+  sharpe_ratio = '{:.2f}'.format(sharpe_ratio)
 
-  # st.write(filtered_data)
-  # trades = st.checkbox('Show Trades')
+  st.write(f'**Cumulative Return:** {cum_return}%')
+  st.write(f'**Average Daily Returns:** {avg_daily_returns}%')
+  st.write(f'**Std Deviation of Daily Returns:** {std_daily_returns}')
+  st.write(f'**Sharpe Ratio:** {sharpe_ratio}')
 
-
-
-
-# model_name = 'model_double-dqn_GOOG_50'
-#
-#
-# verbose = True
-
-# test_stock = 'data/GOOG_2019.csv'
-# test_data = get_stock_data(test_stock)
-# window_size = 10
-# agent = load_model(state_size = window_size, model_name = 'model_double-dqn_GOOG_50' )
-# result, history, shares = evaluate(agent, test_data, window_size = window_size)
-# chart = visualize(df, history)
-# st.altair_chart(chart)
-
-#
