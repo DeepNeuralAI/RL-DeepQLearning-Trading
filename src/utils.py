@@ -4,6 +4,8 @@ import logging
 import pandas as pd
 import numpy as np
 import pdb
+import plotly.express as px
+import plotly.graph_objects as go
 
 from .technical_indicators import (
   indicators_dict,
@@ -78,5 +80,65 @@ def add_technical_features(data, window, fillna = True):
   df = df.join(add_volatility_indicators(high, low, close, window, fillna))
   df = df.join(add_volume_indicators(high, low, close, volume, window, fillna))
   return df
+
+def results_df(price, shares, starting_value = 10_000):
+  results = pd.DataFrame(columns = ['Price', 'Shares', 'Cash', 'Net_Cash', 'Net_Holdings', 'Value', 'Port_Vals'])
+  results.Price = price
+  results.Shares = shares
+  results.Cash = np.zeros(results.shape[0])
+  results.Cash = results.Shares * -results.Price
+  results.Cash[0] += starting_value
+  results.Net_Cash = results.Cash.cumsum()
+
+  results.Net_Holdings = results.Shares.cumsum()
+  results.Value = results.Price * results.Net_Holdings
+  results.Port_Vals = results.Net_Cash + results.Value
+  return results
+
+def get_portfolio_stats(port_val, daily_rf = 0, samples_per_year = 252):
+  cum_return = (port_val[-1] / port_val[0]) - 1
+  daily_returns = (port_val /port_val.shift(1)) - 1
+  daily_returns.iloc[0] = 0
+  daily_returns = daily_returns[1:]
+
+  avg_daily_returns = daily_returns.mean()
+  std_daily_returns = daily_returns.std()
+
+  K = np.sqrt(samples_per_year)
+  sharpe_ratio = K * (avg_daily_returns - daily_rf) / std_daily_returns
+  return cum_return, avg_daily_returns, std_daily_returns, sharpe_ratio
+
+def plot_trades(data, trades, symbol):
+  buy_x = trades.index[trades > 0]
+  buy_y = data.price[trades > 0]
+
+  sell_x = trades.index[trades < 0]
+  sell_y = data.price[trades < 0]
+
+  fig = px.line(data, x=data.index, y='price')
+  fig.add_trace(go.Scatter(
+    x=buy_x,
+    y=buy_y,
+    mode="markers",
+    opacity = 0.8,
+    marker = dict(size = 5, symbol = 0, color = 'lime',
+      line=dict(width=1,color='DarkSlateGrey')
+    ),
+    name="Buy",
+  ))
+  fig.add_trace(go.Scatter(
+    x=sell_x,
+    y=sell_y,
+    mode="markers",
+    marker = dict(size = 5, symbol = 2, color = 'red'),
+    name="Sell",
+  ))
+  fig.update_layout(
+    xaxis_title="<b>Date</b>",
+    yaxis_title='<b>Price</b>',
+    legend_title='<b> Action </b>',
+    template='plotly_white'
+  )
+  return fig
 
 

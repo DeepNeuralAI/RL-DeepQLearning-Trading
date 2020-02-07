@@ -52,7 +52,7 @@ def train_model(agent, episode, data, episode_count = 50, batch_size = 32, windo
         shares = 0
     shares_history.append(shares)
 
-    reward = calc_reward(pct_change[t], net_holdings)
+    reward = calc_reward(pct_change[t] * 100, net_holdings)
     total_profit += reward
 
     # if action == 1: # Buy

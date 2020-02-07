@@ -1,103 +1,24 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import keras.backend.tensorflow_backend as tb
+tb._SYMBOLIC_SCOPE.value = True
 
 from src.methods import evaluate_model
 from src.agent import RLAgent
 from src.BaselineModel import BaselineModel
+from src.HeuristicTrader import HeuristicTrader
 
 
-from src.utils import load_data, add_technical_features, show_evaluation_result, normalize
-import plotly.express as px
-import plotly.graph_objects as go
-
-import keras.backend.tensorflow_backend as tb
-tb._SYMBOLIC_SCOPE.value = True
-
-def transaction_costs(commission, impact, trade):
-  return (impact * abs(trade)) + commission
-
-def create_trades(shares, symbol, prices, commission, impact):
-  trades = pd.DataFrame(index = prices.index)
-  trades[symbol] = shares
-  trades['Cash'] = np.zeros(trades.shape[0])
-
-  transaction = (shares) * -prices
-  transaction_cost = transaction_costs(commission, impact, transaction)
-  value = transaction - transaction_cost
-
-  trades[symbol] = shares
-  trades['Cash'] += value
-  return trades[[symbol, 'Cash']]
-
-def holdings_df(trades, start_val):
-	holdings = trades.copy()
-	holdings['Cash'][0] += start_val
-	return holdings.cumsum()
-
-def values_df(prices, holdings):
-	holdingsAdj = holdings.drop('Cash', axis = 1)
-
-	vals = prices * holdingsAdj
-	vals['Cash'] = holdings[['Cash']]
-	return vals.sum(axis = 1)
-
-def compute_portvals(prices, trades, start_val = 100_000):
-  holdings = holdings_df(trades, start_val)
-  port_vals = values_df(prices, holdings)
-  return port_vals
-
-def get_portfolio_stats(port_val, daily_rf = 0, samples_per_year = 252):
-  cum_return = (port_val[-1] / port_val[0]) - 1
-  daily_returns = (port_val /port_val.shift(1)) - 1
-  daily_returns.iloc[0] = 0
-  daily_returns = daily_returns[1:]
-
-  avg_daily_returns = daily_returns.mean()
-  std_daily_returns = daily_returns.std()
-
-  K = np.sqrt(samples_per_year)
-  sharpe_ratio = K * (avg_daily_returns - daily_rf) / std_daily_returns
-  return cum_return, avg_daily_returns, std_daily_returns, sharpe_ratio
-
-
-def plot_trades(data, trades, symbol):
-  buy_x = trades.index[trades[symbol] > 0]
-  buy_y = data.price[trades[symbol] > 0]
-
-  sell_x = trades.index[trades[symbol] < 0]
-  sell_y = data.price[trades[symbol] < 0]
-
-  fig = px.line(data, x=data.index, y='price')
-  fig.add_trace(go.Scatter(
-    x=buy_x,
-    y=buy_y,
-    mode="markers",
-    opacity = 0.8,
-    marker = dict(size = 5, symbol = 0, color = 'lime',
-      line=dict(width=1,color='DarkSlateGrey')
-    ),
-    name="Buy",
-  ))
-  fig.add_trace(go.Scatter(
-    x=sell_x,
-    y=sell_y,
-    mode="markers",
-    marker = dict(size = 5, symbol = 2, color = 'red'),
-    name="Sell",
-  ))
-  fig.update_layout(
-    xaxis_title="<b>Date</b>",
-    yaxis_title='<b>Price</b>',
-    legend_title='<b> Action </b>',
-    template='plotly_white'
-  )
-  return fig
-
-def plot_return(vals, symbol):
-  fig = px.line(vals, x=vals.index, y=symbol)
-  return fig
-
+from src.utils import (
+  load_data,
+  add_technical_features,
+  show_evaluation_result,
+  normalize,
+  results_df,
+  get_portfolio_stats,
+  plot_trades
+)
 
 @st.cache
 def load_data_(symbol, window_size):
@@ -122,16 +43,17 @@ def sidebar(index):
   window_size = st.sidebar.slider('Window Size', 1, 30, 10)
   return start_date, end_date, window_size
 
+def benchmarks(symbol, data, shares):
+  pass
 
 # Streamlit App
-window_size = 10
 st.title('DeepRL Trader')
 st.subheader('Model uses Double Deep Q Network to generate a policy of optimal trades')
 
 symbols = ['AAPL', 'AMZN', 'CRM', 'FB', 'GOOG', 'JNJ', 'JPM', 'MSFT', 'NFLX', 'SPY', 'TSLA', 'V']
 symbol = st.sidebar.selectbox('Stock Symbol:', symbols)
 
-index = load_data_(symbol, window_size).index
+index = load_data_(symbol, 10).index
 start_date, end_date, window_size = sidebar(index)
 submit = st.sidebar.button('Run')
 
@@ -141,41 +63,44 @@ if submit:
   data = load_data_(symbol, window_size)
   filtered_data = filter_data_by_date(data, start_date, end_date)
 
+
   agent = load_model(filtered_data.shape[1], model_name = model_name)
-  result, history, shares = evaluate(agent, filtered_data, window_size = window_size, verbose = False)
+  profit, history, shares = evaluate(agent, filtered_data, window_size = window_size, verbose = False)
+  results = results_df(filtered_data.price, shares, starting_value = 1_000)
+  cum_return, avg_daily_returns, std_daily_returns, sharpe_ratio = get_portfolio_stats(results.Port_Vals)
 
-  trades = create_trades(shares, symbol, filtered_data.price, 0, 0)
-  holdings = holdings_df(trades, start_val = 100_000)
-  vals = pd.DataFrame(data = values_df(filtered_data.price, holdings)).rename(columns = {0: symbol})
-  returns = '{:.2f}'.format(vals[symbol][-1] - vals[symbol][0])
-
-  cum_return, avg_daily_returns, std_daily_returns, sharpe_ratio = get_portfolio_stats(vals[symbol])
-
-  st.write(f'### Total Return for {symbol}: ${returns}')
-  fig = plot_trades(filtered_data, trades, symbol)
+  st.write(f'### Cumulative Return for {symbol}: {np.around(cum_return * 100, 2)}%')
+  fig = plot_trades(filtered_data, results.Shares, symbol)
   st.plotly_chart(fig)
 
+
   ## Benchmarking
-
   baseline = BaselineModel(symbol, filtered_data, max_shares = 10)
-  baseline_trades = baseline.trades
-  baseline_vals = compute_portvals(filtered_data.price, baseline_trades)
-  cum_return_b, avg_daily_returns_b, std_daily_returns_b, sharpe_ratio_b = get_portfolio_stats(baseline_vals)
+  baseline_results = results_df(filtered_data.price, baseline.shares, starting_value = 1_000)
 
-  benchmark = pd.DataFrame(columns = ['Cumulative Return', 'Avg Daily Returns', 'Std Dev Daily Returns', 'Sharpe Ratio'], index = ['Buy & Hold', 'Double DQN'])
+  heuristic = HeuristicTrader(symbol, filtered_data, window = window_size, max_shares = 10)
+  heuristic_results = results_df(filtered_data.price, heuristic.shares, starting_value = 1_000)
 
-  benchmark.loc['Double DQN']['Cumulative Return'] = cum_return * 100
-  benchmark.loc['Double DQN']['Avg Daily Returns'] = avg_daily_returns * 100
-  benchmark.loc['Double DQN']['Std Dev Daily Returns'] = std_daily_returns
-  benchmark.loc['Double DQN']['Sharpe Ratio'] = sharpe_ratio
+  cum_return_base, avg_daily_returns_base, std_daily_returns_base, sharpe_ratio_base = get_portfolio_stats(baseline_results.Port_Vals)
+  cum_return_heuristic, avg_daily_returns_heuristic, std_daily_returns_heuristic, sharpe_ratio_heuristic = get_portfolio_stats(heuristic_results.Port_Vals)
 
-  benchmark.loc['Buy & Hold']['Cumulative Return'] = cum_return_b * 100
-  benchmark.loc['Buy & Hold']['Avg Daily Returns'] = avg_daily_returns_b * 100
-  benchmark.loc['Buy & Hold']['Std Dev Daily Returns'] = std_daily_returns_b
-  benchmark.loc['Buy & Hold']['Sharpe Ratio'] = sharpe_ratio_b
+  benchmark = pd.DataFrame(columns = ['Cumulative Return', 'Avg Daily Returns', 'Std Dev Daily Returns', 'Sharpe Ratio'], index = ['Double DQN', 'Buy & Hold', 'Heuristic'])
+  benchmark.loc['Double DQN'] = [cum_return * 100, avg_daily_returns * 100, std_daily_returns, sharpe_ratio]
+  benchmark.loc['Heuristic' ] = [cum_return_heuristic * 100, avg_daily_returns_heuristic * 100, std_daily_returns_heuristic, sharpe_ratio_heuristic]
+  benchmark.loc['Buy & Hold'] = [cum_return_base * 100, avg_daily_returns_base * 100, std_daily_returns_base, sharpe_ratio_base]
 
 
   st.table(benchmark.astype('float64').round(4))
+
+  st.header('Raw Data')
+  st.subheader('Double DQN')
+  st.dataframe(results)
+
+  st.subheader('Buy & Hold')
+  st.write(baseline_results)
+
+  st.subheader('Heuristic')
+  st.write(heuristic_results)
 
 
 
