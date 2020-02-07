@@ -37,17 +37,17 @@ def train_model(agent, episode, data, episode_count = 50, batch_size = 32, windo
     action = agent.action(state)
 
     if action == 2 and net_holdings == 0:
-        shares = -10
-        net_holdings += -10
-    elif action == 2 and net_holdings == 10:
-        shares = -20
-        net_holdings += -20
+        shares = -100
+        net_holdings += -100
+    elif action == 2 and net_holdings == 100:
+        shares = -200
+        net_holdings += -200
     elif action == 1 and net_holdings == 0:
-        shares = 10
-        net_holdings += 10
-    elif action == 1 and net_holdings == -10:
-        shares = 20
-        net_holdings += 20
+        shares = 100
+        net_holdings += 100
+    elif action == 1 and net_holdings == -100:
+        shares = 200
+        net_holdings += 200
     else:
         shares = 0
     shares_history.append(shares)
