@@ -121,7 +121,7 @@ def plot_trades(data, trades, symbol):
     y=buy_y,
     mode="markers",
     opacity = 0.8,
-    marker = dict(size = 5, symbol = 0, color = 'lime',
+    marker = dict(size = 7, symbol = 0, color = 'lime',
       line=dict(width=1,color='DarkSlateGrey')
     ),
     name="Buy",
@@ -130,15 +130,42 @@ def plot_trades(data, trades, symbol):
     x=sell_x,
     y=sell_y,
     mode="markers",
-    marker = dict(size = 5, symbol = 2, color = 'red'),
+    opacity = 0.8,
+    marker = dict(size = 7, symbol = 2, color = 'red'),
     name="Sell",
   ))
   fig.update_layout(
     xaxis_title="<b>Date</b>",
     yaxis_title='<b>Price</b>',
     legend_title='<b> Action </b>',
-    template='plotly_white'
+    template='plotly_white',
+    title = f'{symbol}'
   )
   return fig
 
-
+def plot_benchmark(baseline_results, heuristic_results, model_results):
+  fig = go.Figure()
+  fig.add_trace(go.Line(
+    x=baseline_results.index,
+    y=baseline_results.Port_Vals / baseline_results.Port_Vals[0],
+    mode="lines",
+    name="Baseline",
+  ))
+  fig.add_trace(go.Line(
+    x=baseline_results.index,
+    y=heuristic_results.Port_Vals / heuristic_results.Port_Vals[0],
+    mode="lines",
+    name="Heuristic",
+  ))
+  fig.add_trace(go.Line(
+    x=baseline_results.index,
+    y=model_results.Port_Vals / model_results.Port_Vals[0],
+    mode="lines",
+    name="DDQN",
+  ))
+  fig.update_layout(title='Benchmark',
+    xaxis_title='<b>Date</b>',
+    yaxis_title='<b>Normalized Portfolio Value ($)</b>',
+    template='plotly_white'
+  )
+  return fig

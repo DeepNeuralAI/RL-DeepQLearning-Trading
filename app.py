@@ -17,7 +17,8 @@ from src.utils import (
   normalize,
   results_df,
   get_portfolio_stats,
-  plot_trades
+  plot_trades,
+  plot_benchmark
 )
 
 @st.cache
@@ -91,6 +92,9 @@ if submit:
 
 
   st.table(benchmark.astype('float64').round(4))
+
+  fig = plot_benchmark(baseline_results, heuristic_results, results)
+  st.plotly_chart(fig)
 
   st.header('Raw Data')
   st.subheader('Double DQN')
