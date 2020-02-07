@@ -8,6 +8,7 @@ from src.methods import evaluate_model
 from src.agent import RLAgent
 from src.BaselineModel import BaselineModel
 from src.HeuristicTrader import HeuristicTrader
+from how_it_works import how_it_works
 
 
 from src.utils import (
@@ -57,13 +58,15 @@ symbol = st.sidebar.selectbox('Stock Symbol:', symbols)
 index = load_data_(symbol, 10).index
 start_date, end_date, window_size = sidebar(index)
 submit = st.sidebar.button('Run')
+if st.sidebar.checkbox('How Does This Work?'):
+  how_it_works()
+
 
 
 if submit:
   model_name = symbol
   data = load_data_(symbol, window_size)
   filtered_data = filter_data_by_date(data, start_date, end_date)
-
 
   agent = load_model(filtered_data.shape[1], model_name = model_name)
   profit, history, shares = evaluate(agent, filtered_data, window_size = window_size, verbose = False)
