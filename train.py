@@ -8,7 +8,6 @@ import keras.backend as K
 from src.utils import timestamp, show_training_result, load_data, add_technical_features
 from src.methods import train_model, evaluate_model
 from src.agent import RLAgent
-from tensorboardX import SummaryWriter
 import pdb
 
 def run(training_stock, validation_stock, window_size, batch_size, episode_count, model_type="ddqn", model_name = None, pretrained = False, verbose = False):

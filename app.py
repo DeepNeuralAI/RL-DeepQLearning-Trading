@@ -45,8 +45,13 @@ def sidebar(index):
   window_size = st.sidebar.slider('Window Size', 1, 30, 10)
   return start_date, end_date, window_size
 
-def benchmarks(symbol, data, shares):
-  pass
+def benchmarks(symbol, data, window_size = 10):
+   baseline = BaselineModel(symbol, data, max_shares = 10)
+   baseline_results = results_df(data.price, baseline.shares, starting_value = 1_000)
+   heuristic = HeuristicTrader(symbol, data, window = window_size, max_shares = 10)
+   heuristic_results = results_df(data.price, heuristic.shares, starting_value = 1_000)
+
+   return baseline_results, heuristic_results
 
 # Streamlit App
 st.title('DeepRL Trader')
@@ -77,13 +82,9 @@ if submit:
   fig = plot_trades(filtered_data, results.Shares, symbol)
   st.plotly_chart(fig)
 
-
   ## Benchmarking
-  baseline = BaselineModel(symbol, filtered_data, max_shares = 10)
-  baseline_results = results_df(filtered_data.price, baseline.shares, starting_value = 1_000)
 
-  heuristic = HeuristicTrader(symbol, filtered_data, window = window_size, max_shares = 10)
-  heuristic_results = results_df(filtered_data.price, heuristic.shares, starting_value = 1_000)
+  baseline_results, heuristic_results = benchmarks(symbol, filtered_data)
 
   cum_return_base, avg_daily_returns_base, std_daily_returns_base, sharpe_ratio_base = get_portfolio_stats(baseline_results.Port_Vals)
   cum_return_heuristic, avg_daily_returns_heuristic, std_daily_returns_heuristic, sharpe_ratio_heuristic = get_portfolio_stats(heuristic_results.Port_Vals)
