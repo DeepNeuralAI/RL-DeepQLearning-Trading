@@ -5,7 +5,12 @@ import coloredlogs
 from docopt import docopt
 import datetime as dt
 import keras.backend as K
-from src.utils import timestamp, show_training_result, load_data, add_technical_features
+from src.utils import (
+  timestamp,
+  show_training_result,
+  load_data,
+  add_technical_features
+)
 from src.methods import train_model, evaluate_model
 from src.agent import RLAgent
 import pdb
