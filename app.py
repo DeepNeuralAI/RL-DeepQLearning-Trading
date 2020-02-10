@@ -57,7 +57,7 @@ def benchmarks(symbol, data, window_size = 10):
 st.title('DeepRL Trader')
 st.subheader('Model uses Double Deep Q Network to generate a policy of optimal trades')
 
-symbols = ['AAPL', 'AMZN', 'CRM', 'FB', 'GOOG', 'JNJ', 'JPM', 'MSFT', 'NFLX', 'SPY', 'TSLA', 'V']
+symbols = ['AAPL', 'AMZN', 'FB', 'GOOG', 'IBM','JNJ', 'NFLX', 'SPY', 'TSLA']
 symbol = st.sidebar.selectbox('Stock Symbol:', symbols)
 
 index = load_data_(symbol, 10).index
