@@ -1,7 +1,8 @@
 # DeepRL Trader
 
-## Summary
-This project frames stock market trading (a single stock) as a Markov Decision Process. Specifically, this application uses a reinforcement learning model, Double Deep Q Network to generate an optimal set of trades that maximize daily return.
+![trader](public/benchmark.png)
+
+This project frames stock market trading as a _Markov Decision Process._ Specifically, this application uses a deep reinforcement learning model, **Double Deep Q Network** to generate an optimal set of trades that maximizes daily return.
 
 ## Instructions
 
@@ -11,6 +12,24 @@ This project frames stock market trading (a single stock) as a Markov Decision P
 git clone https://github.com/DeepNeuralAI/RL-DeepQLearning-Trading.git
 pip install -r requirements.txt
 streamlit run app.py
+```
+
+#### Presentation Slides
+
+Further details regarding the motivation, methods and results of implementation can be found in my presentation [here](http://bit.ly/Aaron-Mendonsa-DeepRLSlides).
+
+### Training
+
+To train the model, use the following command:
+```
+$ python3 train.py --train data/GOOG.csv --valid GOOG_2018.csv --episode-count 50 --window-size 10
+```
+
+### Evaluation
+
+To evaluate the given model, use the following command:
+```
+$ python3 evaluate.py --eval data/GOOG.csv --model-name GOOG --window-size 10 --verbose True:
 ```
 
 ## How It Works
@@ -32,7 +51,7 @@ We can use a table to store experience tuples, namely a _Q-table_, to take a dis
 
 Instead of storing a massive lookup table, we can instead approximate Q(s,a) with neural networks, named a Deep Q Network (DQN)
 
-<img src="public/dqn.png" height=400 width=500>
+<img src="public/dqn.png" height=500 width=700>
 
 
 
