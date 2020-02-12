@@ -40,6 +40,32 @@ To evaluate the given model, use the following command:
 $ python3 evaluate.py --eval data/GOOG.csv --model-name GOOG --window-size 10 --verbose True
 ```
 
+### Repository File Structure
+
+```
+RL-DeepQLearning-Trading
+├── README.md
+├── app.py
+├── conda.txt
+├── data
+│   ├── CSV Data
+├── evaluate.py
+├── how_it_works.py
+├── models
+│   ├── Models
+├── public
+│   ├── Media Assets
+├── requirements.txt
+├── src
+│   ├── BaselineModel.py
+│   ├── HeuristicTrader.py
+│   ├── agent.py
+│   ├── methods.py
+│   ├── technical_indicators.py
+│   └── utils.py
+└── train.py
+```
+
 ## Results
 
 ![demo](public/demo_model.gif)
