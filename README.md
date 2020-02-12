@@ -11,6 +11,8 @@ This project frames stock market trading as a _Markov Decision Process._ Specifi
 
  We apply the model to ten stocks and observe that it does on occasion outperform the standard benchmark approach on most stocks using the measure of Sharpe Ratio.
 
+ ![dwad](public/ddqn.svg)
+
 #### Presentation Slides
 
 Further details regarding the motivation, methods and results of implementation can be found in my presentation [here](http://bit.ly/Aaron-Mendonsa-DeepRLSlides).
