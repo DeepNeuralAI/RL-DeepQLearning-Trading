@@ -139,6 +139,7 @@ In 2015, Google DeepMind showed that in stochastic environments, Q-learning and 
 [Hasselt, et.al](https://arxiv.org/abs/1509.06461) proposed using a double estimator to construct DQN and showed that the Double DQN (DDQN) converged to a more optimal policy and tended to estimate the true value more closely.
 
 The figure below is the implementation used in this application:
-<img src="public/ddqn.svg" height=500 width=500>
+
+<img src="public/ddqn.svg?sanitize=true" height="500" width="500" style="height: 100%;padding:0px;margin: 0px;">
 
 
