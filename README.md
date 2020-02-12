@@ -69,6 +69,8 @@ RL-DeepQLearning-Trading
 ### Q4 2010
 
 #### Trades
+**Inputs**: Price & Volume
+
 The model outputs an optimal set of trades (**Buy/Sell/Hold**), as observed in the figure below:
 <img src="public/GOOG.png" height=375 width=600>
 
@@ -87,6 +89,16 @@ Based upon the previous figure, the model calculates the normalized portfolio va
 
 ### Data
 
+#### Acquisition
+
+An API call is made to [AlphaVantage Stock Time Series Data](https://www.alphavantage.co/documentation/), specifically `TIME_SERIES_DAILY_ADJUSTED`
+
+This API returns daily time series (date, daily open, daily high, daily low, daily close, daily volume, daily adjusted close, and split/dividend events) of the global equity specified, covering 20+ years of historical data.
+
+The most recent data point is the prices and volume information of the current trading day, updated realtime.
+
+#### Feature Generation
+
 Technical indicators are derived from fundamental price and volume in the categories of:
 * Trend
 * Momentum
@@ -95,11 +107,11 @@ Technical indicators are derived from fundamental price and volume in the catego
 
 The data has a total of ***33 technical features*** and is then normalized and fed through the Double DQN
 
-#### Training Data'
+#### Training Data
 
 The RL agent is trained on 7-10 years of historical data
 
-#### Test Data'
+#### Test Data
 
 The RL agent is tested on an unseen set of 1-2 years of price/volume data. In most cases, this would be 2019 price/volume data
 
@@ -125,5 +137,8 @@ Instead of storing a massive lookup table, this project will approximate Q(s,a) 
 In 2015, Google DeepMind showed that in stochastic environments, Q-learning and DQN tends to overestimate and learn very poorly. From a high level perspective, these overestimations tend to result from a positive bias due to taking the maximum expected action value.
 
 [Hasselt, et.al](https://arxiv.org/abs/1509.06461) proposed using a double estimator to construct DQN and showed that the Double DQN (DDQN) converged to a more optimal policy and tended to estimate the true value more closely.
+
+The figure below is the implementation used in this application:
+<img src="public/ddqn.svg" height=500 width=500>
 
 
