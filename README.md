@@ -41,5 +41,23 @@ $ python3 evaluate.py --eval data/GOOG.csv --model-name GOOG --window-size 10 --
 
 ## Results
 
+### Q4 2010
+
+#### Trades
+The model outputs an optimal set of trades (**Buy/Sell/Hold**), as observed in the figure below:
+<img src="public/GOOG.png" height=400 width=600>
+
+#### Benchmark Evaluation
+Based upon the previous figure, the model calculates the normalized portfolio value for:
+
+* **Buy & Hold Strategy**: Baseline Model
+* **Heuristic**:
+  * Buy if price below 2 standard deviations from the simple moving average
+  * Sell if price above 2 standard deviations from the simple moving average
+* **Double DQN**: The trained policy of the Double Deep Q Network/RL Model
+
+<img src="public/benchmark.png" height=400 width=600>
+
+
 
 
