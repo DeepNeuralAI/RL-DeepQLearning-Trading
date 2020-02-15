@@ -24,6 +24,7 @@ Further details regarding the motivation, methods and results of implementation 
 ```shell
 git clone https://github.com/DeepNeuralAI/RL-DeepQLearning-Trading.git
 pip install -r requirements.txt
+pip install streamlit
 streamlit run app.py
 ```
 
