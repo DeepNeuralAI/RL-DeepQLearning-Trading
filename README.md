@@ -23,7 +23,8 @@ Further details regarding the motivation, methods and results of implementation 
 2. To run it locally:
 ```shell
 git clone https://github.com/DeepNeuralAI/RL-DeepQLearning-Trading.git
-pip install -r requirements.txt
+conda env create -f environment.yml
+conda activate deepRLTrader
 streamlit run app.py
 ```
 
