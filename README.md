@@ -2,6 +2,27 @@
 
 This application uses a deep reinforcement learning model [**Double Deep Q Network**](https://arxiv.org/abs/1509.06461) to generate an optimal set of trades that maximizes daily return.
 
+### Contents
+- [DeepRL Trader](#deeprl-trader)
+    - [Contents](#contents)
+  - [Main Idea](#main-idea)
+      - [Presentation Slides](#presentation-slides)
+  - [Usage](#usage)
+    - [Training](#training)
+    - [Evaluation](#evaluation)
+    - [Repository File Structure](#repository-file-structure)
+  - [Results](#results)
+    - [Q4 2010](#q4-2010)
+      - [Trades](#trades)
+      - [Benchmark Evaluation](#benchmark-evaluation)
+  - [How It Works](#how-it-works)
+    - [Data](#data)
+      - [Acquisition](#acquisition)
+      - [Feature Generation](#feature-generation)
+      - [Training Data](#training-data)
+      - [Test Data](#test-data)
+    - [Model](#model)
+
 ## Main Idea
 
 <img src="public/AMZN_bad.png" width=500 height=300>
