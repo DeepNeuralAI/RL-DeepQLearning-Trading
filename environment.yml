@@ -74,7 +74,6 @@ dependencies:
   - setuptools=45.1.0=py37_0
   - six=1.14.0=py37_0
   - sqlite=3.30.1=ha441bb4_0
-  - tensorboard=2.0.0=pyhb38c66f_1
   - tensorflow=2.0.0=mkl_py37hda344b4_0
   - tensorflow-base=2.0.0=mkl_py37h66b1bf0_0
   - tensorflow-estimator=2.0.0=pyh2649769_0
@@ -147,7 +146,6 @@ dependencies:
     - statsmodels==0.11.0
     - streamlit==0.53.0
     - ta==0.5.11
-    - tensorboardx==2.0+a7f3124
     - terminado==0.8.3
     - toml==0.10.0
     - toolz==0.10.0
