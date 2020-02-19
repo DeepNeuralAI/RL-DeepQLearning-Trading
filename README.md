@@ -40,7 +40,7 @@ Further details regarding the motivation, methods and results of implementation 
 
 ## Usage
 
-1. To play interactively with the model, visit the deployed Streamlit app [here](http://bit.ly/DeepRLTrader)
+1. **To play interactively with the model, visit the deployed Streamlit app [here](http://bit.ly/DeepRLTrader)**
 2. To run it locally:
 ```shell
 git clone https://github.com/DeepNeuralAI/RL-DeepQLearning-Trading.git
